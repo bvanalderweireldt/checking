@@ -91,7 +91,7 @@ sub insert_operation {
 	my $content_compress;
 	use IO::Compress::Gzip qw(gzip $GzipError) ;
 	
-	gzip \$args->{content} => \$content_compress [,OPTS];
+	gzip \$args->{content} => \$content_compress;
 	
 	DEBUG length($content_compress);
 	DEBUG length($args->{content});
