@@ -55,7 +55,7 @@ sub getSiteByStatus{
 	my @refSitesByStatus;
 	
 	foreach my $refSite ( @{ $self->{refSites} } ){
-		if( Site::getStatus($refSite) == $args->{status} ){
+		if( $refSite->Site::getStatus() == $args->{status} ){
 			push( @refSitesByStatus, $refSite );
 		}
 	}
