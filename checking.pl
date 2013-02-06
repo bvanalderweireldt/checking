@@ -5,35 +5,10 @@
 
 use strict;
 use warnings;
+use File::Basename;
 
-package Conf{
-#We define the working directory to where the script is executed
-use Cwd 'abs_path';
-my $exec_path = abs_path($0);
-$exec_path =~ s/\/\w{1,10}\.pl//;
-
-#Method called by other workspace to get the working dir
-sub getExecPath{
-	return $exec_path;
-}
-
-my $test = 0;
-if( $ARGV[0] eq "test" ){
-	$test = 1;
-}
-#Are we in environment test ?
-sub getEnvironment{
-	if($test){
-		return "-test";
-	}
-	else{
-		return "";
-	}
-}
-}
-
-use lib Conf::getExecPath();
-chdir Conf::getExecPath();
+eval 'use lib "'.dirname(__FILE__).'"';
+eval 'chdir "'.dirname(__FILE__).'"';
 
 use Db;
 use Site;
@@ -62,7 +37,9 @@ my $maxScreenDifference = 10;
 
 #Connecting to db
 DEBUG "Connecting to Database !";
-my $db = Db->new();
+my $db_test = 0;
+$db_test = 1 if( defined $ARGV[0] && $ARGV[0] eq 'test' );
+my $db = Db->new($db_test);
 
 #LOAD EVERY WEBSITES
 DEBUG "Loading Emails !";

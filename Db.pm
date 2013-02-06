@@ -8,14 +8,25 @@ use DBI;
 use strict;
 package Db;
 
+use Log::Log4perl qw(:easy);
+
 #CONSTRUCTOR
 sub new {
-	my ($class) = @_;
+	my ($class) = shift;
+	
+	my $target = "checkingweb";
+	
+	if( defined $_[0] && $_[0] == 1){
+		$target .= "-test";
+		INFO "### Test mode selected switch to the test db !";
+	}
+	
 	my $self = {};	
 	bless $self, $class;
-	$self->{_dsn}		=	"DBI:mysql:database=checkingweb;host=localhost;port=3306;mysql_socket=/var/lib/mysql/mysql.sock";
 		
-	$self->{_db} 		=	DBI->connect($self->{_dsn}, "checkingweb", "APdzfHI7xhXmDm139x1p3T") or die "Cannot connect to Mysql";
+	$self->{_dsn}		=	"DBI:mysql:database=$target;host=localhost;port=3306;mysql_socket=/var/lib/mysql/mysql.sock";
+		
+	$self->{_db} 		=	DBI->connect($self->{_dsn}, $target, "APdzfHI7xhXmDm139x1p3T") or die "Cannot connect to Mysql";
 	
 	return $self
 }
