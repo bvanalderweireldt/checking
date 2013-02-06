@@ -87,7 +87,15 @@ sub insert_operation {
 		,googleCodeResult ,versionCmsResult ,id_site, generatingTime, pageRank )
 		VALUES (NULL , NOW() ,  ?,  ?, NULL, NULL , ? ,  ?,  ?, ?, ?);";
 	my $db_keywords = $self->{_db}->prepare( $insert_operation );
-
+	
+	my $content_compress;
+	use IO::Compress::Gzip qw(gzip $GzipError) ;
+	
+	gzip \$args->{content} => \$content_compress [,OPTS];
+	
+	DEBUG length($content_compress);
+	DEBUG length($args->{content});
+	
 	$db_keywords->execute( $args->{content}, $args->{ping}, $args->{anaStatus}, $args->{cms}, $args->{id}, $args->{genTime}, $args->{pageRank});
 }
 #LOAD OPERATION FROM ID
