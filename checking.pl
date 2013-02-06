@@ -90,7 +90,7 @@ while ( my @email = $emails_db->fetchrow_array() ) {
 			$sites_tested{$website[0]} = Site->new( $website[0], $website[1], $website[2], $website[3] );
 		}
 
-		$emailToNotify->addSiteRef( \$sites_tested{$website[0]} );
+		$emailToNotify->addSiteRef( $sites_tested{$website[0]} );
 
 	}
 
