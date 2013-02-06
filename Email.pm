@@ -105,6 +105,7 @@ sub getFormatContent{
 
 	return $content;
 }
+#Format one table line for one status
 sub formatSitesCategorie{
 	my $self = shift;
 	my ($args) = shift;
@@ -124,5 +125,10 @@ sub formatSitesCategorie{
     return $cat_top."</ul></div></td></tr>";
 	
 }
+#Format anchor link for websites
+sub format_anchor{
+	return "<a href='".$_[0]."'>".$_[0]."</a>";
+}
+
 1;
 

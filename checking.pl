@@ -267,11 +267,6 @@ foreach my $email_account ( @emails ){
 
 }
 
-#Format anchor link for websites
-sub format_anchor{
-	return "<a href='".$_[0]."'>".$_[0]."</a>";
-}
-
 #ADD A HTTP PROTOCOL IF THE URL DOES NOT HAVE IT
 sub http_protocol{
 	if( ( $_[0] !~ /^http://///) ){
