@@ -309,7 +309,7 @@ sub formatSitesCategorie{
 	
 	my @refSitesByStatus = $args->{email_account}->getSiteByStatus( { sites => $args->{sites}, status => $args->{status} } );
 	
-	if( ! @ids ){
+	if( ! @refSitesByStatus ){
 		return "";
 	}
 	
