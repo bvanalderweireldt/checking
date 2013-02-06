@@ -9,6 +9,7 @@ use strict;
 package Db;
 
 use Log::Log4perl qw(:easy);
+Log::Log4perl->easy_init($INFO);
 
 #CONSTRUCTOR
 sub new {
@@ -93,8 +94,8 @@ sub insert_operation {
 	
 	gzip \$args->{content} => \$content_compress;
 	
-	DEBUG length($content_compress);
-	DEBUG length($args->{content});
+	INFO length($content_compress);
+	INFO length($args->{content});
 	
 	$db_keywords->execute( $args->{content}, $args->{ping}, $args->{anaStatus}, $args->{cms}, $args->{id}, $args->{genTime}, $args->{pageRank});
 }
