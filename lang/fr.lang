@@ -1,0 +1,11 @@
+title=Verification de vos sites web
+top_teaser=Service de verification de vos sites web.
+
+help=Pour informations : <ul><li>Le status HTTP d'un site est egale a 200 lorsque le site fonctionne, 400 la requete est mauvaise, 401 necessite une authorisation, 403 acces interdit, 404 page non trouvee, 500 erreur interne du serveur...(<a href="http://fr.wikipedia.org/wiki/Liste_des_codes_HTTP">pour plus d'informations</a>)</li><li>Les sites avec des mots suspicieux ont dans leurs contenu certains mots qui decelenchent une alerte (hack, erreur SQL, Error php....) qui signifierait alors que le site repond mais n'est pas fonctionnel</li><li>Les sites dont des mots sont absents declenchent une alerte car les mots attendus sur le site n'ont pas ete rencontres</li><li>Les sites avec un temps de reponse ont mis plus de 15 secondes a repondre</li></ul> 
+
+http_error=Status http incorrect
+match_keywords=Mots clefs suspicieux
+unmatch_keywords=Mots clefs absents
+high_generating_time=Temps de reponse eleve
+malformed_url=L'adresse du site est incorect
+check_ok=Aucun probleme
