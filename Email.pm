@@ -18,7 +18,7 @@ sub new {
 	$self->{prenom}	= $prenom;
 	$self->{cc}	= $cc;
 	$self->{frequency} = $frequency;
-	$self->{idSites} = ();
+	$self->{refSites} = ();
 
 	return $self
 }
@@ -29,14 +29,14 @@ sub getEmail{
 	return $self->{email};
 }
 #Getter for the id_site
-sub getIdSites{
+sub getSitesRef{
 	my $self = shift;
-	return $self->{idSites};
+	return $self->{refSites};
 }
 #Add one ref for the idSites
-sub addIdSite{
+sub addSiteRef{
 	my $self = shift;
-	push( @{ $self->{idSites} }, $_[0] );
+	push( @{ $self->{refSites} }, $_[0] );
 }
 #Getter for the cc
 sub getCc{
@@ -50,14 +50,14 @@ sub getSiteByStatus{
 	my $self = shift;
 	my ($args) = $_[0];
 	
-	my @ids;
+	my @refSitesByStatus;
 	
-	foreach my $id ( @{ $self->{idSites} } ){
-		if( %{ $args->{sites} }->{$id}->getStatus() == $args->{status} ){
-			push( @ids, $id );
+	foreach my $refSite ( @{ $self->{refSites} } ){
+		if( $refSite->getStatus() == $args->{status} ){
+			push( @refSitesByStatus, $refSite );
 		}
 	}
-	return @ids;
+	return @refSitesByStatus;
 }
 1;
 

@@ -28,7 +28,7 @@ use File::Slurp;
 use Data::Dumper;
 
 #LOGGER
-Log::Log4perl->easy_init($WARN);
+Log::Log4perl->easy_init($INFO);
 DEBUG "Starting checking !";
 
 #Generating time limit ( ms )
@@ -85,11 +85,12 @@ while ( my @email = $emails_db->fetchrow_array() ) {
 
 	while ( my @website = $websites_db->fetchrow_array() ){
 		DEBUG "_Found one website link to ".$email[0]." : ".$website[1];
-		$emailToNotify->addIdSite( $website[0] );
 
 		if( ! exists $sites_tested{$website[1]} ){
 			$sites_tested{$website[0]} = Site->new( $website[0], $website[1], $website[2], $website[3] );
 		}
+
+		$emailToNotify->addSiteRef( \$sites_tested{$website[0]} );
 
 	}
 
@@ -110,8 +111,6 @@ my @keywords = $db->loadkeywords();
 
 #CHECK WEBSITE
 DEBUG "Starting the main loop to check every websites !";
-
-
 
 while ( ( my $key, $_ ) = each( %sites_tested ) ){
 	DEBUG "scanning ".$_->getLabel();
@@ -249,42 +248,36 @@ foreach my $email_account ( @emails ){
 	
 	$content .= formatSitesCategorie({ 
 		email_account => $email_account, 
-		sites => \%sites_tested, 
 		status => 1, 
 		title => Properties::getLang({ lang => $lang, key => "http_error" })
 	});
 
 	$content .= formatSitesCategorie({ 
 		email_account => $email_account, 
-		sites => \%sites_tested, 
 		status => 2, 
 		title => Properties::getLang({ lang => $lang, key => "match_keywords" })
 	});
 	
 	$content .= formatSitesCategorie({ 
 		email_account => $email_account, 
-		sites => \%sites_tested, 
 		status => 3, 
 		title => Properties::getLang({ lang => $lang, key => "unmatch_keywords" })
 	});
 
 	$content .= formatSitesCategorie({ 
 		email_account => $email_account, 
-		sites => \%sites_tested, 
 		status => 4, 
 		title => Properties::getLang({ lang => $lang, key => "high_generating_time" })
 	});
 
 	$content .= formatSitesCategorie({ 
 		email_account => $email_account, 
-		sites => \%sites_tested, 
 		status => 6, 
 		title => Properties::getLang({ lang => $lang, key => "malformed_url" })
 	});
 
 	$content .= formatSitesCategorie({ 
 		email_account => $email_account, 
-		sites => \%sites_tested, 
 		status => 20, 
 		title => Properties::getLang({ lang => $lang, key => "check_ok" })
 	});
@@ -314,7 +307,7 @@ foreach my $email_account ( @emails ){
 sub formatSitesCategorie{
 	my ($args) = @_;
 	
-	my @ids = $args->{email_account}->getSiteByStatus( { sites => $args->{sites}, status => $args->{status} } );
+	my @refSitesByStatus = $args->{email_account}->getSiteByStatus( { sites => $args->{sites}, status => $args->{status} } );
 	
 	if( ! @ids ){
 		return "";
@@ -322,8 +315,8 @@ sub formatSitesCategorie{
 	
 	my $cat_top = "<tr><td valign=\"top\"><div mc:edit=\"std_content00\"><h4 class=\"h4\">$args->{title}</h4><ul>";
 	
-	foreach my $site ( @ids ){
-		$cat_top .= "<li>".format_anchor($args->{sites}->{$site}->getLabel())." ".$args->{sites}->{$site}->toString({ lang => $lang })."</li>";
+	foreach my $site ( @refSitesByStatus ){
+		$cat_top .= "<li>".format_anchor($site->getLabel())." ".$site->toString({ lang => $lang })."</li>";
 	}
 	
     return $cat_top."</ul></div></td></tr>";

@@ -9,7 +9,6 @@ use strict;
 package Db;
 
 use Log::Log4perl qw(:easy);
-Log::Log4perl->easy_init($INFO);
 
 #CONSTRUCTOR
 sub new {
@@ -76,14 +75,7 @@ sub loadscreenshot {
 sub insert_operation {
 	my $self = shift;
 	my ($args) = $_[0];
-	my $id = $_[0];
-	my $screenshot = $_[1];
-	my $ping = $_[2];
-	my $cms = $_[3];
-	my $generatingTime = $_[4];
-	my $googleCode = $_[5];
-	my $pageRank = $_[6];
-	#SQL Query load all suspicious keywords 
+
 	my $insert_operation = "INSERT INTO monitorServer_operation (id_ ,dateStarted ,screenshotResult ,pingResult ,matchKeywordResult, unMatchKeywordResult 
 		,googleCodeResult ,versionCmsResult ,id_site, generatingTime, pageRank )
 		VALUES (NULL , NOW() ,  ?,  ?, NULL, NULL , ? ,  ?,  ?, ?, ?);";
