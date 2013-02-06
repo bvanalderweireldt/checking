@@ -5,8 +5,13 @@
 
 use strict;
 use warnings;
-use lib "/home/checking/checking-v2";
-chdir "/home/checking/checking-v2";
+
+use Cwd 'abs_path';
+my $exec_path = abs_path($0);
+$exec_path =~ s/\/\w{1,10}\.pl//;
+
+use lib "$exec_path";
+chdir "$exec_path";
 use Db;
 use Site;
 use Email;
