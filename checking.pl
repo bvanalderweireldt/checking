@@ -5,10 +5,12 @@
 
 use strict;
 use warnings;
-use File::Basename;
 
-eval 'use lib "'.dirname(__FILE__).'"';
-eval 'chdir "'.dirname(__FILE__).'"';
+BEGIN{
+	use File::Basename;
+	eval 'use lib "'.dirname(__FILE__).'"';
+	eval 'chdir "'.dirname(__FILE__).'"';
+}
 
 use Db;
 use Site;
