@@ -37,6 +37,9 @@ my $generatingTimeLimit = 15000;
 #Difference between last screenshot and new one maximum in %
 my $maxScreenDifference = 10;
 
+#DEFAULT LANGAGE
+my $lang = "fr";
+
 #Connecting to db
 DEBUG "Connecting to Database !";
 my $db_test = 0;
@@ -46,7 +49,6 @@ my $db = Db->new($db_test);
 #LOAD EVERY WEBSITES
 DEBUG "Loading Emails !";
 my $emails_db = $db->loadEmails();
-
 
 #If their is no emails to check we stop here
 die("No emails to check !") unless $emails_db->{NUM_OF_FIELDS} > 0;
@@ -79,7 +81,7 @@ while ( my @email = $emails_db->fetchrow_array() ) {
 	DEBUG "#### Find one email account to check ".$email[0].", now will load websites associates.";
 
 	#we a new email and save it into the global array of email
-	my $emailToNotify = Email->new( $email[0], $email[1], $email[2], $email[3], $email[4] );
+	my $emailToNotify = Email->new( $email[0], $email[1], $email[2], $email[3], $email[4], $lang );
 
 	my $websites_db = $db->loadWebsitesEmailAccount( $email[0] );
 
@@ -228,59 +230,20 @@ DEBUG "End of the main scanning loop !";
 my $mail_template_dir = "mail_template";
 my $mail_template = read_file( $mail_template_dir."/basic.html" );
 
-my $title = Properties::getLang({ lang => "fr", key => "title" });
-my $top_teaser = Properties::getLang({ lang => "fr", key => "top_teaser" });
-my $help = Properties::getLang({ lang => "fr", key => "help" });
-
 $mail_template =~ s/{title}/$title/g;
 $mail_template =~ s/{top_teaser}/$top_teaser/;
 $mail_template =~ s/{help}/$help/;
-
-#DEFAULT LANGAGE
-my $lang = "fr";
 
 #SEND EMAILS
 DEBUG "Starting the email loop";
 foreach my $email_account ( @emails ){
 	DEBUG "Preparing mail content for : ".$email_account->getEmail();
 	
-	my $content = "";
-	
-	$content .= formatSitesCategorie({ 
-		email_account => $email_account, 
-		status => 1, 
-		title => Properties::getLang({ lang => $lang, key => "http_error" })
-	});
+	my $title = Properties::getLang({ lang => $email_account->getLang(), key => "title" });
+	my $top_teaser = Properties::getLang({ lang => $email_account->getLang(), key => "top_teaser" });
+	my $help = Properties::getLang({ lang => $email_account->getLang(), key => "help" });
 
-	$content .= formatSitesCategorie({ 
-		email_account => $email_account, 
-		status => 2, 
-		title => Properties::getLang({ lang => $lang, key => "match_keywords" })
-	});
-	
-	$content .= formatSitesCategorie({ 
-		email_account => $email_account, 
-		status => 3, 
-		title => Properties::getLang({ lang => $lang, key => "unmatch_keywords" })
-	});
-
-	$content .= formatSitesCategorie({ 
-		email_account => $email_account, 
-		status => 4, 
-		title => Properties::getLang({ lang => $lang, key => "high_generating_time" })
-	});
-
-	$content .= formatSitesCategorie({ 
-		email_account => $email_account, 
-		status => 6, 
-		title => Properties::getLang({ lang => $lang, key => "malformed_url" })
-	});
-
-	$content .= formatSitesCategorie({ 
-		email_account => $email_account, 
-		status => 20, 
-		title => Properties::getLang({ lang => $lang, key => "check_ok" })
-	});
+	my $content = $email_account->getFormatContent();
 
 	my $local_mail_template = $mail_template;
 	$local_mail_template =~ s/{content}/$content/;
@@ -303,26 +266,6 @@ foreach my $email_account ( @emails ){
 
 
 }
-
-sub formatSitesCategorie{
-	my ($args) = @_;
-	
-	my @refSitesByStatus = $args->{email_account}->getSiteByStatus( { sites => $args->{sites}, status => $args->{status} } );
-	
-	if( ! @refSitesByStatus ){
-		return "";
-	}
-	
-	my $cat_top = "<tr><td valign=\"top\"><div mc:edit=\"std_content00\"><h4 class=\"h4\">$args->{title}</h4><ul>";
-	
-	foreach my $site ( @refSitesByStatus ){
-		$cat_top .= "<li>".format_anchor($site->getLabel())." ".$site->toString({ lang => $lang })."</li>";
-	}
-	
-    return $cat_top."</ul></div></td></tr>";
-	
-}
-
 
 #Format anchor link for websites
 sub format_anchor{

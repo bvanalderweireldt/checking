@@ -11,7 +11,7 @@ use Site;
 
 #CONSTRUCTOR
 sub new {
-	my ( $class, $email, $nom, $prenom, $cc, $frequency ) = @_;
+	my ( $class, $email, $nom, $prenom, $cc, $frequency, $lang ) = @_;
 	my $self = {};	
 	bless $self, $class;
 		
@@ -21,6 +21,7 @@ sub new {
 	$self->{cc}	= $cc;
 	$self->{frequency} = $frequency;
 	$self->{refSites} = ();
+	$self->{lang} = $lang;
 
 	return $self
 }
@@ -45,6 +46,11 @@ sub getCc{
 	my $self = shift;
 	return $self->{cc};
 }
+#Getter for lang
+sub getLang{
+	my $self = shift;
+	return $self->{lang};
+}
 #Return an array of id of websites corresponding to the status
 # 1) -> ref to the id hash
 # 2) -> status expected
@@ -55,12 +61,68 @@ sub getSiteByStatus{
 	my @refSitesByStatus;
 	
 	foreach my $refSite ( @{ $self->{refSites} } ){
-		print $refSite->Site::getStatus()."\n"; 
 		if( $refSite->Site::getStatus() == $args->{status} ){
 			push( @refSitesByStatus, $refSite );
 		}
 	}
 	return @refSitesByStatus;
+}
+#Return the content of this email
+sub getFormatContent{
+	my $self = shift;
+
+	my $content = "";
+	
+	$content .= $self->formatSitesCategorie({ 
+		status => 1, 
+		title => Properties::getLang({ lang => $self->{lang}, key => "http_error" })
+	});
+
+	$content .= $self->formatSitesCategorie({ 
+		status => 2, 
+		title => Properties::getLang({ lang => $self->{lang}, key => "match_keywords" })
+	});
+	
+	$content .= $self->formatSitesCategorie({ 
+		status => 3, 
+		title => Properties::getLang({ lang => $self->{lang}, key => "unmatch_keywords" })
+	});
+
+	$content .= $self->formatSitesCategorie({ 
+		status => 4, 
+		title => Properties::getLang({ lang => $self->{lang}, key => "high_generating_time" })
+	});
+
+	$content .= $self->formatSitesCategorie({ 
+		status => 6, 
+		title => Properties::getLang({ lang => $self->{lang}, key => "malformed_url" })
+	});
+
+	$content .= $self->formatSitesCategorie({ 
+		status => 20, 
+		title => Properties::getLang({ lang => $self->{lang}, key => "check_ok" })
+	});
+
+	return $content;
+}
+sub formatSitesCategorie{
+	my $self = shift;
+	my ($args) = shift;
+	
+	my @refSitesByStatus = $self->getSiteByStatus( { sites => $args->{sites}, status => $args->{status} } );
+	
+	if( ! @refSitesByStatus ){
+		return "";
+	}
+	
+	my $cat_top = "<tr><td valign=\"top\"><div mc:edit=\"std_content00\"><h4 class=\"h4\">$args->{title}</h4><ul>";
+	
+	foreach my $site ( @refSitesByStatus ){
+		$cat_top .= "<li>".format_anchor($site->getLabel())." ".$site->toString({ lang => $lang })."</li>";
+	}
+	
+    return $cat_top."</ul></div></td></tr>";
+	
 }
 1;
 
