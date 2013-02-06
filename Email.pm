@@ -6,7 +6,7 @@
 
 use strict;
 package Email;
-
+use Data::Dumper;
 #CONSTRUCTOR
 sub new {
 	my ( $class, $email, $nom, $prenom, $cc, $frequency ) = @_;
@@ -52,7 +52,10 @@ sub getSiteByStatus{
 	
 	my @refSitesByStatus;
 	
+	
+	
 	foreach my $refSite ( @{ $self->{refSites} } ){
+		print Dumper($refSite);
 		if( $refSite->getStatus() == $args->{status} ){
 			push( @refSitesByStatus, $refSite );
 		}
