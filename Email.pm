@@ -52,10 +52,8 @@ sub getSiteByStatus{
 	
 	my @refSitesByStatus;
 	
-	
-	
 	foreach my $refSite ( @{ $self->{refSites} } ){
-		print Dumper($refSite);
+		print Dumper($refSite->{status});
 		if( $refSite->{status} == $args->{status} ){
 			push( @refSitesByStatus, $refSite );
 		}
