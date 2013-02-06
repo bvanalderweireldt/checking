@@ -118,7 +118,7 @@ sub formatSitesCategorie{
 	my $cat_top = "<tr><td valign=\"top\"><div mc:edit=\"std_content00\"><h4 class=\"h4\">$args->{title}</h4><ul>";
 	
 	foreach my $site ( @refSitesByStatus ){
-		$cat_top .= "<li>".format_anchor($site->getLabel())." ".$site->toString({ lang => $lang })."</li>";
+		$cat_top .= "<li>".format_anchor($site->getLabel())." ".$site->toString({ lang => $self->{lang} })."</li>";
 	}
 	
     return $cat_top."</ul></div></td></tr>";
