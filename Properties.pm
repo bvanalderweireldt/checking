@@ -12,8 +12,6 @@ Log::Log4perl->easy_init($WARN);
 
 use Config::Properties;
 
-chdir "/home/checking/checking-v2";
-
 #LOAD ENGLISH LANG
 open PROPS_ENG, "< lang/eng.lang"
 	or die "unable to open configuration file";

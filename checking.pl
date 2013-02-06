@@ -6,12 +6,35 @@
 use strict;
 use warnings;
 
+package Conf{
+#We define the working directory to where the script is executed
 use Cwd 'abs_path';
 my $exec_path = abs_path($0);
 $exec_path =~ s/\/\w{1,10}\.pl//;
 
-use lib "$exec_path";
-chdir "$exec_path";
+#Method called by other workspace to get the working dir
+sub getExecPath{
+	return $exec_path;
+}
+
+my $test = 0;
+if( $ARGV[0] eq "test" ){
+	$test = 1;
+}
+#Are we in environment test ?
+sub getEnvironment{
+	if($test){
+		return "-test";
+	}
+	else{
+		return "";
+	}
+}
+}
+
+use lib Conf::getExecPath();
+chdir Conf::getExecPath();
+
 use Db;
 use Site;
 use Email;
