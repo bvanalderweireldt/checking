@@ -230,10 +230,6 @@ DEBUG "End of the main scanning loop !";
 my $mail_template_dir = "mail_template";
 my $mail_template = read_file( $mail_template_dir."/basic.html" );
 
-$mail_template =~ s/{title}/$title/g;
-$mail_template =~ s/{top_teaser}/$top_teaser/;
-$mail_template =~ s/{help}/$help/;
-
 #SEND EMAILS
 DEBUG "Starting the email loop";
 foreach my $email_account ( @emails ){
@@ -242,6 +238,10 @@ foreach my $email_account ( @emails ){
 	my $title = Properties::getLang({ lang => $email_account->getLang(), key => "title" });
 	my $top_teaser = Properties::getLang({ lang => $email_account->getLang(), key => "top_teaser" });
 	my $help = Properties::getLang({ lang => $email_account->getLang(), key => "help" });
+
+	$mail_template =~ s/{title}/$title/g;
+	$mail_template =~ s/{top_teaser}/$top_teaser/;
+	$mail_template =~ s/{help}/$help/;
 
 	my $content = $email_account->getFormatContent();
 
