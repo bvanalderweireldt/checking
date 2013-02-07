@@ -47,10 +47,10 @@ $db_test = 1 if( defined $ARGV[0] && $ARGV[0] eq 'test' );
 my $db = Db->new($db_test);
 
 #Enable String gZip for site content in database
-my $db_content_gZip = 0;
-if( defined $ARGV[1] && $ARGV[1] eq 'gzip' ){
-	$db_content_gZip = 1; 
-	INFO "# gZip enable !";
+my $db_content_gZip = 1;
+if( defined $ARGV[1] && $ARGV[1] eq 'dgzip' ){
+	$db_content_gZip = 0; 
+	INFO "# gZip disable !";
 }
 
 #LOAD EVERY WEBSITES
