@@ -302,7 +302,7 @@ sub detect_cms{
 	}
 
 
-	if ( undef $result || $result eq "" ){
+	if ( !defined $result || $result eq "" ){
 		return "Cannot determine the CMS";
 	}
 	#Drupal Detection
