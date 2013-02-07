@@ -92,9 +92,12 @@ sub insert_operation {
 	$db_keywords->execute( $args->{content}, $args->{ping}, $args->{anaStatus}, $args->{cms}, $args->{id}, $args->{genTime}, $args->{pageRank});
 }
 #LOAD OPERATION FROM ID
-sub loadOperationFromId {
+sub loadScreenShotByOperationId {
 	my $self = shift;
-	my $id = $_[0];
+	my ($args) = shift;
 	
+	my $loadScreenShotByOperationId = "select screenshotResult from monitorServer_operation where id_ = ".$args->{id};
+	my ( $screenshot ) = $self->{_db}->selectrow_array( $loadScreenShotByOperationId );
+	return $screenshot;
 }
 1;

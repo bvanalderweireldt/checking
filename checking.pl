@@ -41,7 +41,7 @@ my $maxScreenDifference = 10;
 my $lang = "fr";
 
 #Connecting to db
-DEBUG "Connecting to Database !";
+INFO "Connecting to Database !";
 my $db_test = 0;
 $db_test = 1 if( defined $ARGV[0] && $ARGV[0] eq 'test' );
 my $db = Db->new($db_test);
@@ -57,7 +57,7 @@ die("No emails to check !") unless $emails_db->{NUM_OF_FIELDS} > 0;
 my @timeData = localtime(time);
 my $h = $timeData[2];
 my $m = $timeData[1];
-#time frequency in min
+#Time frequency in min
 my $frequency = 30;
 my $t = int( $m / $frequency ) + ( $h * ( 60 / $frequency ) );
 
@@ -196,7 +196,7 @@ while ( ( my $key, $_ ) = each( %sites_tested ) ){
 	#PAGE RANK of the site
 	DEBUG "Scanning for Google Rank ".$_->getLabel();
 	my $pr = WWW::Google::PageRank->new;
-#	$_->setPageRank( $pr->get( $_->getLabel(), $_->getLabel() ) );
+	$_->setPageRank( $pr->get( $_->getLabel(), $_->getLabel() ) );
 
 	#Get the CMS name and version
 	DEBUG "Detecting cms ".$_->getLabel();
@@ -302,7 +302,7 @@ sub detect_cms{
 	}
 
 
-	if ( $result eq "" ){
+	if ( undef $result || $result eq "" ){
 		return "Cannot determine the CMS";
 	}
 	#Drupal Detection
