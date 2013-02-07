@@ -97,6 +97,7 @@ sub loadScreenShotByOperationId {
 	my ($args) = shift;
 	
 	my $loadScreenShotByOperationId = "select screenshotResult from monitorServer_operation where id_ = ".$args->{id};
+	INFO $loadScreenShotByOperationId;
 	my ( $screenshot ) = $self->{_db}->selectrow_array( $loadScreenShotByOperationId );
 	return $screenshot;
 }

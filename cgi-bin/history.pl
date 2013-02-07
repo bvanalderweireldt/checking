@@ -24,7 +24,7 @@ print "Content-type:text/html\r\n\r\n";
 #check the request is correct POST method
 print ( "Bad Request only POST is supported !\n" ) and $error=1 unless ( $req->request_method() eq "GET" );
 #check the ID argument not empty
-print ( "You need to provide an ID to get an operation screenshot !\n") and $error=1 unless ( $req->param('id') ne "" );
+print ( "You need to provide an ID to get an operation screenshot !\n") and die() unless ( $req->param('id') ne "" );
 
 my $db = Db->new();
 
