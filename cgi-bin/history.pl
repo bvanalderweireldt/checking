@@ -5,7 +5,7 @@
 
 BEGIN{
 	use File::Basename;
-	eval 'use lib "../'.dirname(__FILE__).'"';
+	eval 'use lib "'.dirname(__FILE__).'/../"';
 	eval 'chdir "'.dirname(__FILE__).'"';
 }
 
