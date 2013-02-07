@@ -26,7 +26,7 @@ print ( "Bad Request only POST is supported !\n" ) and $error=1 unless ( $req->r
 #check the ID argument not empty
 print ( "You need to provide an ID to get an operation screenshot !\n") and die() unless ( $req->param('id') ne "" );
 
-my $db = Db->new();
+my $db = Db->new($req->param('test'));
 
 my $screenshot = $db->loadScreenShotByOperationId({ id => $req->param('id') });
 
