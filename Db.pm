@@ -88,7 +88,7 @@ sub insert_operation {
 		gzip \$args->{content} => \$content_compress;
 		
 		use bytes;
-		my $gain = (length($args->{content}) - length($content_compress)) * 1000;
+		my $gain = (length($args->{content}) - length($content_compress)) / 1000;
 		INFO "gZip saved ".$gain." kBytes !";
 		$args->{content} = $content_compress;	
 	}
