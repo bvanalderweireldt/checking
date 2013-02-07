@@ -293,7 +293,7 @@ sub detect_cms{
 	my $dom = Mojo::DOM->new;
 	$dom->parse( $_[0] );
 
-	my $result;
+	my $result = "";
 
 	for my $meta ( $dom->find('meta')->each() ){
 		if( defined $meta->attrs->{name} and $meta->attrs->{name} =~ /generator/i ){
