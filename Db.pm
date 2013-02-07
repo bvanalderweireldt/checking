@@ -81,13 +81,17 @@ sub insert_operation {
 		VALUES (NULL , NOW() ,  ?,  ?, NULL, NULL , ? ,  ?,  ?, ?, ?);";
 	my $db_keywords = $self->{_db}->prepare( $insert_operation );
 	
-	#my $content_compress;
-	#use IO::Compress::Gzip qw(gzip $GzipError) ;
-	
-	#gzip \$args->{content} => \$content_compress;
-	
-	#INFO length($content_compress);
-	#INFO length($args->{content});
+	if( $args->{gzip} ){
+		use IO::Compress::Gzip qw(gzip $GzipError) ;
+		my $content_compress;
+		
+		gzip \$args->{content} => \$content_compress;
+		
+		use bytes;
+		my $gain = (length($args->{content}) - length($content_compress)) * 1000;
+		INFO "gZip saved ".$gain." kBytes !";
+		$args->{content} = $content_compress;	
+	}
 	
 	$db_keywords->execute( $args->{content}, $args->{ping}, $args->{anaStatus}, $args->{cms}, $args->{id}, $args->{genTime}, $args->{pageRank});
 }

@@ -46,6 +46,10 @@ my $db_test = 0;
 $db_test = 1 if( defined $ARGV[0] && $ARGV[0] eq 'test' );
 my $db = Db->new($db_test);
 
+#Enable String gZip for site content in database
+my $db_content_gZip = 0;
+$db_content_gZip = 1 if( defined $ARGV[1] && $ARGV[1] eq 'gzip' );
+
 #LOAD EVERY WEBSITES
 DEBUG "Loading Emails !";
 my $emails_db = $db->loadEmails();
@@ -221,7 +225,8 @@ while ( ( my $key, $_ ) = each( %sites_tested ) ){
 		ping => 0, 
 		genTime => $_->getGenTime(), 
 		anaStatus => $_->getGoogleAnaStatus(), 
-		pageRank => $_->getPageRank() });
+		pageRank => $_->getPageRank(),
+		gzip => db_content_gZip });
 
 }
 DEBUG "End of the main scanning loop !";
