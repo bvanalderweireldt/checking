@@ -15,17 +15,10 @@ BEGIN{
 use Db;
 use Site;
 use Email;
-use Properties;
-use LWP::UserAgent;
 use Time::HiRes qw(tv_interval gettimeofday);
-use Switch;
-use Net::Ping;
-use WWW::Google::PageRank;
 use Log::Log4perl qw(:easy);
-use Mojo::DOM;
 use MIME::Lite;
 use File::Slurp;
-use Data::Dumper;
 
 #LOGGER
 Log::Log4perl->easy_init($INFO);
@@ -172,111 +165,4 @@ foreach my $email_account ( @emails ){
 	             );
 	
 	$msg->send;
-
-
 }
-
-#ADD A HTTP PROTOCOL IF THE URL DOES NOT HAVE IT
-sub http_protocol{
-	if( ( $_[0] !~ /^http://///) ){
-		$_[0] = "http://".$_[0] ;
-	}
-	return $_[0];
-}
-
-#Return true if the HTTP code is unauthorized answer
-sub is_unauthorized {
-	switch ( $_[0] ) {
-		case [401, 403] { return 1 }
-		else { return 0 }
-	}
-}
-#Concat 2 string, if the left string is not null we add a coma between them
-sub comaConcat {
-	return $_[1] if( $_[0] eq "" );		
-	return $_[0].",".$_[1];
-}
-#Detect CMS
-sub detect_cms{
-
-	my $dom = Mojo::DOM->new;
-	$dom->parse( $_[0] );
-
-	my $result = "";
-
-	for my $meta ( $dom->find('meta')->each() ){
-		if( defined $meta->attrs->{name} and $meta->attrs->{name} =~ /generator/i ){
-			$result = $meta->attrs->{content};
-		}
-	}
-
-
-	if ( !defined $result || $result eq "" ){
-		return "Cannot determine the CMS";
-	}
-	#Drupal Detection
-	if ( $result =~ /(.)*drupal(.)*/i ) {
-		#Drupal 
-		return "drupal";
-	}
-	elsif ( $result =~ /(.)*prestashop(.)*/i ){
-		#Prestashop
-		my $ua = new LWP::UserAgent;
-
-		my $response = $ua->post('http://presta-version.bv-blog.fr/cgi-bin/version_presta.pl', { url => $_[1] });
-
-		my $content = $response->content;
-
-		return "prestashop ".$content;
-	}
-	elsif ( $result =~ /(.)*joomla(.)*/i ){
-		#Joomla
-		return "joomla";
-	}
-	elsif ( $result =~ /(.)*wordpress(.)*/i ){
-		#Wordpress
-		return "wordpress";
-	}
-	elsif ( $result ne "" ){
-		return $result;
-	}
-}
-#Compare 2 screen and return a % of difference (each time a line is different)
-sub compare_2_screen {
-	my $screen = "tmp_screen";
-	my $last_screen = "tmp_last_screen";
-
-	open ( my $screen_handler, '>', $screen);
-	print $screen_handler $_[0];
-	close $screen_handler;
-
-	open ( my $last_screen_handler, '>', $last_screen);
-	print $last_screen_handler $_[1];
-	close $last_screen_handler;
-
-	my $screen_nl = `cat $screen | wc -l`;
-	my $last_screen_nl = `cat $last_screen | wc -l`;
-
-	open ( $screen_handler, '<', $screen);
-	open ( $last_screen_handler, '<', $last_screen);
-
-	my $different_line = 0;
-	my $total_line = 0;
-	my $screen_line = "";
-	my $last_screen_line = "";
-	while ( $screen_line = <$screen_handler> ) {
-		#if ( index( $_[1], $screen_line ) != -1 ){
-		#	$different_line++;
-		#}
-		$total_line++;
-	}
-
-	$different_line = ( $total_line == $screen_nl ) ? $different_line : abs( $screen_nl - $total_line ) + $different_line;
-
-	if( $total_line == 0 ){
-		return 0;}
-	else{
-		return ceil ( ( $different_line / $total_line ) * 100 );
-	}
-} 	 	
-
