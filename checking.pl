@@ -96,7 +96,7 @@ while ( my @email = $emails_db->fetchrow_array() ) {
 		DEBUG "_Found one website link to ".$email[0]." : ".$website[1];
 
 		if( ! exists $sites_tested{$website[1]} ){
-			$sites_tested{$website[0]} = Site->new( \@website );
+			$sites_tested{$website[0]} = Site->newFromDbArray( \@website );
 		}
 
 		$emailToNotify->addSiteRef( $sites_tested{$website[0]} );
