@@ -174,7 +174,7 @@ sub computeGooglePageRank{
 sub detectCms{
 	my ($self) = shift;
 	my $dom = Mojo::DOM->new;
-	$dom->parse( $_[0] );
+	$dom->parse( $self->{content} );
 
 	my $result;
 
