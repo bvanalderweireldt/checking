@@ -119,7 +119,7 @@ while ( ( my $key, $_ ) = each( %sites_tested ) ){
 	#initial status = 20 -> no error
 	$_->setStatus( 20 );
 
-	$_->checkSite( \@keywords );
+	$_->checkSite( { keywords => \@keywords } );
 
 	DEBUG "Inserting operation for website : ".$_->getAddress();
 	$db->insert_operation( { 
