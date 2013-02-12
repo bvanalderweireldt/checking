@@ -96,7 +96,7 @@ while ( my @email = $emails_db->fetchrow_array() ) {
 		DEBUG "_Found one website link to ".$email[0]." : ".$website[1];
 
 		if( ! exists $sites_tested{$website[1]} ){
-			$sites_tested{$website[0]} = Site->new( $website[0], $website[1], $website[2], $website[3] );
+			$sites_tested{$website[0]} = Site->new( \@website );
 		}
 
 		$emailToNotify->addSiteRef( $sites_tested{$website[0]} );
@@ -106,13 +106,6 @@ while ( my @email = $emails_db->fetchrow_array() ) {
 	push( @emails, $emailToNotify );
 }
 
-#user agent used to interact with the website
-DEBUG "Initializing User Agent !";
-my $ua = LWP::UserAgent->new();
-	$ua->agent('Mozilla/5.0 (Macintosh; Intel Mac OS X 10_7_5) AppleWebKit/536.26.14 (KHTML, like Gecko) Version/6.0.1 Safari/536.26.14');
-	$ua->timeout(50);
-	$ua->max_redirect(10);
-	$ua->env_proxy;
 
 #load general keywords to check in every website, trigger an alert in one of these keywords is found
 DEBUG "Loading global keywords !";
@@ -126,100 +119,8 @@ while ( ( my $key, $_ ) = each( %sites_tested ) ){
 	#initial status = 20 -> no error
 	$_->setStatus( 20 );
 
-	#if the URL is malformed we save the status 6 (malformed) and go on to the next site
-	if( $_->getLabel() !~ /^[^.].*(.)(fr|com|eu|net|org|us|gf|vn|es|biz|info|ch|ru|xxx|biz|name|pro|localhost|html)/i ){
-		$_->setStatus( 6 );
-		next;
-	}
+	$_->checkSite( \@keywords );
 
-	#check if the http protocol is present, if not simply add it
-	$_->setLabel( http_protocol( $_->getLabel ) );
-
-	#we download the website content and save the generating time
-	DEBUG "Download and get the generating time ".$_->getLabel();
-	my($timeStart) = [gettimeofday()];
-	my $response = $ua->get( $_->getLabel );
-	$_->setContent( $response->as_string );
-	my($timeElapsed) = tv_interval($timeStart, [gettimeofday()]);
-	$_->setGenTime( $timeElapsed * 1000 );
-	#GENERATING TIME, if the generating time is bigger than the limit
-	if( $_->getGenTime() > $generatingTimeLimit ){
-		$_->setStatus( 5 );
-	}
-
-	#we get the http response code from the user agent
-	$_->setHttpResp( $response->code ); 	
-
-	#if the response code is an error, and is different than 401 and 403 ( unauthorized ) we stop here, the site is down
-	if( $response->is_error and ! is_unauthorized( $response->code ) ){
-		$_->setStatus( 1 );
-		next;
-	}
-
-	#check if in the page their is one of the global keywords
-	DEBUG "Scanning for global keywords ".$_->getLabel();
-	my $match_string = "";
-	my $match = 0;
-	foreach my $global_keyword (@keywords ){
-		if ( $_->getContent() =~ /.*$global_keyword.*/i ){
-			$match_string = comaConcat( $match_string, $global_keyword );
-			$match = 1;
-		}
-	}
-	if ( $match == 1 ){
-		$_->setMatchKey( $match_string );
-		$_->setStatus( 2 );
-	}
-
-	#check if in the page their is not one of the specified keywords
-	DEBUG "Scanning for unmatch keywords ".$_->getLabel();
-	$match = 1;
-	my $unMatch_string = "";
-	if( defined $_->getKeywords() ){
-		my @keywords_specific = split ( ";", $_->getKeywords() );
-		foreach my $keyword ( @keywords_specific ){
-			#if it doesn't contain the given keyword
-			if ( $_->getContent() !~ /.*$keyword.*/ ){
-				$unMatch_string = comaConcat( $unMatch_string, $keyword );
-				$match = 0;
-			}
-		}
-	}
-	if( $match == 0 ){
-		$_->setUnMatchKey( $unMatch_string );
-		$_->setStatus( 3 );
-	}
-
-
-	#GOOGLE CODE result
-	DEBUG "Scanning for google analytics ".$_->getLabel();
-	if ( $_->getContent =~ /.*google-analytics.com.*\/ga.js/ ){
-		$_->setGoogleAnaStatus( 1 );
-	}
-	else{
-		$_->setGoogleAnaStatus( 0 );
-	}
-
-	#PAGE RANK of the site
-	DEBUG "Scanning for Google Rank ".$_->getLabel();
-	my $pr = WWW::Google::PageRank->new;
-	$_->setPageRank( $pr->get( $_->getLabel(), $_->getLabel() ) );
-
-	#Get the CMS name and version
-	DEBUG "Detecting cms ".$_->getLabel();
-	$_->setCms( detect_cms( $_->getContent(), $_->getLabel() ) );
-
-	#Load the last screenshot
-	DEBUG "Scanning for difference since last screen shot ".$_->getLabel();
-	my $last_screen = $db->loadscreenshot(  $_->getId() );
-	#compute the differenece from the previous one and the actual one
-	if( defined $last_screen ){
-		#my $screen_difference = compare_2_screen( $_->getContent(), $last_screen );
-		#$screen_difference = ( defined $screen_difference ) ? $screen_difference : 0;
-		#if( $screen_difference > $maxScreenDifference ){
-		#	$_->setStatus( 4 );
-		#}
-	}
 	DEBUG "Inserting operation for website : ".$_->getLabel();
 	$db->insert_operation( { 
 		id => $_->getId(), 

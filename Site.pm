@@ -7,23 +7,64 @@
 use strict;
 package Site;
 
+use Data::Dumper;
 use Switch;
+use LWP::UserAgent;
+use Time::HiRes qw(tv_interval gettimeofday);
+use WWW::Google::PageRank;
+use Mojo::DOM;
+use Log::Log4perl qw(:easy);
+Log::Log4perl->easy_init($DEBUG);
 use Properties;
 
-#CONSTRUCTOR
+my $protocol = "http://";
+
+my $ua = LWP::UserAgent->new();
+	$ua->agent('Mozilla/5.0 (Macintosh; Intel Mac OS X 10_7_5) AppleWebKit/536.26.14 (KHTML, like Gecko) Version/6.0.1 Safari/536.26.14');
+	$ua->timeout(50);
+	$ua->max_redirect(10);
+	$ua->env_proxy;
+
+#Generating time limit ( ms )
+my $generatingTimeLimit = 15000;
+
+#Basic Constructor
 sub new {
-	my ( $class, $id, $label, $keywords, $status ) = @_;
+	my ($class) = shift;
+	my ($args) = shift;
+
 	my $self = {};	
 	bless $self, $class;
 		
-	$self->{id}			=		$id;
-	$self->{label} 		=		$label;
-	$self->{keywords}	=		$keywords;
-	$self->{status}		=		$status;
+	$self->{id}	= $args->{id};
+
+	$args->{address} =~ s/^http(s)?://i;
+	$self->{address} = $args->{address};
+	$self->{keywords} =	$args->{keywords};
+	$self->{status}	= $args->{status};
 	
 	return $self
 }
 
+#Consctructor from DB array 
+#1) -> id
+#2) -> address
+#3) -> keywords
+#4) -> status
+sub newFromDbArray{
+	my ($class) = shift;
+	my ($args) = shift;
+
+	my $self = {};
+	bless $self, $class;
+
+	$self->{id} = @{$args->{site}}[0];
+	$self->{address} = @{$args->{site}}[1];
+	$self->{keywords} = @{$args->{site}}[2];
+	$self->{status} = @{$args->{site}}[3];
+
+	return $self;
+}
 sub toString{
 	my ($self) = @_;
 	my ($args) = $_[1];
@@ -49,7 +90,149 @@ sub toString{
 	}
 	}
 }
+#Check if the web site address is correct or not
+sub validateUrl{
+	my ($self) = shift;
+	if( $self->getAddress() !~ /^[^.]*(.)[a-zA-Z]+/i ){
+		$self->{status} = 6 ;
+		return 0;
+	}
+	return 1;
+}
+#Download the content of the website and save the generating time of the page
+sub download{
+	my ($self) = shift;
 
+	my($timeStart) = [gettimeofday()];
+	my $response = $ua->get( $protocol.$self->{address} );
+	$self->{content} = $response->as_string ;
+	my($timeElapsed) = tv_interval($timeStart, [gettimeofday()]);
+	$self->{genTime} = ( $timeElapsed * 1000 );
+
+	#GENERATING TIME, if the generating time is bigger than the limit
+	if( $self->{genTime} > $generatingTimeLimit ){
+		$self->{status} = 5;
+	}
+
+	#we get the http response code from the user agent
+	$self->{httpResp} = $response->code; 	
+
+	#if the response code is an error, and is different than 401 and 403 ( unauthorized ) we stop here, the site is down
+	if( $response->is_error and ! is_unauthorized( $response->code ) ){
+		$self->{status} = 1;
+		return 0;
+	}
+	return 1;
+}
+
+#Scan for the presence of global keyword
+sub scanGLobalKeywords{
+	my ($self) = shift;
+	my ($args) = shift;
+
+	$self->{matchKey} = "";
+	foreach my $global_keyword ( @{$args->{keywords}} ){
+		if ( $self->{content} =~ /.*$global_keyword.*/i ){
+			$self->{matchKey} = comaConcat( $self->{matchKey}, $global_keyword );
+			$self->{status} = 2;
+		}
+	}
+}
+#scan for expected keywords that doesn't match
+sub scanUnMatchKeywords{
+	my ($self) = shift;
+
+	$self->{unMatchKey} = "";
+	if( defined $self->{keywords} ){
+		my @keywords_specific = split ( ";", $self->{keywords} );
+		foreach my $keyword ( @keywords_specific ){
+			#if it doesn't contain the given keyword
+			if ( $self->{content} !~ /.*$keyword.*/ ){
+				$self->{unMatchKey} = comaConcat( $self->{unMatchKey}, $keyword );
+				$self->{status} = 3;
+			}
+		}
+	}
+}
+#Scan for Google Analytic Presence
+sub scanForGoogleAnalytic{
+	my ($self) = shift;
+	if ( $self->{content} =~ /.*google-analytics.com.*\/ga.js/ ){
+		$self->{googleAnaStatus} = 1;
+	}
+	else{
+		$self->{googleAnaStatus} = 0;
+	}
+}
+#Get the google page rank
+sub computeGooglePageRank{
+	my ($self) = shift;
+	my $pr = WWW::Google::PageRank->new;
+	$self->{pageRank} = $pr->get( $self->{address}, $self->{address} );
+}
+#Try to guess if the site is running a CMS
+sub detectCms{
+	my ($self) = shift;
+	my $dom = Mojo::DOM->new;
+	$dom->parse( $_[0] );
+
+	my $result;
+
+	for my $meta ( $dom->find('meta')->each() ){
+		if( defined $meta->attrs->{name} and $meta->attrs->{name} =~ /generator/i ){
+			$result = $meta->attrs->{content};
+		}
+	}
+
+
+	if ( $result eq "" ){
+		return "Cannot determine the CMS";
+	}
+	#Drupal Detection
+	if ( $result =~ /(.)*drupal(.)*/i ) {
+		#Drupal 
+		return "drupal";
+	}
+	elsif ( $result =~ /(.)*prestashop(.)*/i ){
+		#Prestashop
+		my $ua = new LWP::UserAgent;
+
+		my $response = $ua->post('http://presta-version.bv-blog.fr/cgi-bin/version_presta.pl', { url => $_[1] });
+
+		my $content = $response->content;
+
+		return "prestashop ".$content;
+	}
+	elsif ( $result =~ /(.)*joomla(.)*/i ){
+		#Joomla
+		return "joomla";
+	}
+	elsif ( $result =~ /(.)*wordpress(.)*/i ){
+		#Wordpress
+		return "wordpress";
+	}
+	elsif ( $result ne "" ){
+		return $result;
+	}
+}
+sub checkSite{
+	my ($self) = shift;
+	my ($args) = shift;
+
+	return 0 if !$self->validateUrl();
+	return 0 if !$self->download();
+	$self->scanGLobalKeywords({keywords => $args->{keywords}});
+	$self->scanUnMatchKeywords();
+	$self->scanForGoogleAnalytic();
+	$self->detectCms();
+	$self->computeGooglePageRank();
+
+}
+#Concat 2 string, if the left string is not null we add a coma between them
+sub comaConcat {
+	return $_[1] if( $_[0] eq "" );		
+	return $_[0].",".$_[1];
+}
 #Setter for the status
 sub setStatus{
 	my $self = shift;
@@ -146,9 +329,9 @@ sub getId{
 	return $self->{id};
 }
 #Getter for the label
-sub getLabel{
+sub getAddress{
 	my $self = shift;
-	return $self->{label};
+	return $self->{address};
 }
 #Setter for the label
 sub setLabel{
