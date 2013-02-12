@@ -115,13 +115,13 @@ my @keywords = $db->loadkeywords();
 DEBUG "Starting the main loop to check every websites !";
 
 while ( ( my $key, $_ ) = each( %sites_tested ) ){
-	DEBUG "scanning ".$_->getLabel();
+	DEBUG "scanning ".$_->getAddress();
 	#initial status = 20 -> no error
 	$_->setStatus( 20 );
 
 	$_->checkSite( \@keywords );
 
-	DEBUG "Inserting operation for website : ".$_->getLabel();
+	DEBUG "Inserting operation for website : ".$_->getAddress();
 	$db->insert_operation( { 
 		id => $_->getId(), 
 		content => $_->getContent(), 
