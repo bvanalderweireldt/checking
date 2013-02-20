@@ -24,20 +24,45 @@ use File::Slurp;
 Log::Log4perl->easy_init($INFO);
 DEBUG "Starting checking !";
 
-#Generating time limit ( ms )
-my $generatingTimeLimit = 15000;
+my $db = "checkingweb";
+my $gzip = 1;
+my $siteid = 0;
+foreach my $arg ( @ARGV ){
+	if( $arg =~ /db=\w+/i ){
+		$db = extractArg({ arg => $arg });
+	}
+	elsif( $arg =~ /gzip=(0|1)/i ){
+		$gzip = extractArg({ arg => $arg });
+	}
+	elsif( $arg =~ /siteid=\d+/i){
+		$siteid = extractArg({ arg => $arg })
+	}
+	elsif( $arg =~ /-h/i ){
+		displayHelp();
+		return 1;
+	}
+	else{
+		die("Error wrong argument passed, type -h to see help !");
+	}
+}
 
-#Difference between last screenshot and new one maximum in %
-my $maxScreenDifference = 10;
+sub displayHelp{
+	print "Checking Help :\n
+	db={db+username} default=checkingweb\n
+	gzip={0 or 1} gzip compression for screenshot default=1
+	idsite={idsite} check only one site";
+	
+}
 
-#DEFAULT LANGAGE
-my $lang = "fr";
+sub extractArg{
+	my ($args) = shift;
+	$args->{arg} =~ s/^\w+=//;
+	return  $args->{arg};
+}
 
 #Connecting to db
 INFO "Connecting to Database !";
-my $db_test = 0;
-$db_test = 1 if( defined $ARGV[0] && $ARGV[0] eq 'test' );
-my $db = Db->new($db_test);
+my $db = Db->new($db);
 
 #Enable String gZip for site content in database
 my $db_content_gZip = 1;
@@ -81,7 +106,12 @@ while ( my @email = $emails_db->fetchrow_array() ) {
 	DEBUG "#### Find one email account to check ".$email[0].", now will load websites associates.";
 
 	#we a new email and save it into the global array of email
-	my $emailToNotify = Email->new( $email[0], $email[1], $email[2], $email[3], $email[4], $lang );
+	my $emailToNotify = Email->new( { 
+		email => $email[0], 
+		nom => $email[1], 
+		prenom => $email[2], 
+		cc => $email[3], 
+		frequency => $email[4]);
 
 	my $websites_db = $db->loadWebsitesEmailAccount( $email[0] );
 

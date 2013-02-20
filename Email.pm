@@ -9,19 +9,27 @@ package Email;
 use Data::Dumper;
 use Site;
 
+#DEFAULT LANGAGE
+my $lang = "fr";
+
 #CONSTRUCTOR
 sub new {
-	my ( $class, $email, $nom, $prenom, $cc, $frequency, $lang ) = @_;
+	my ($args) = shift;
 	my $self = {};	
 	bless $self, $class;
-		
-	$self->{email} = $email;
-	$self->{nom} =	$nom;
-	$self->{prenom}	= $prenom;
-	$self->{cc}	= $cc;
-	$self->{frequency} = $frequency;
+	
+	#Apply default language if empty
+	if(!defined $args->{lang}){
+		$args->{lang} = $lang;
+	}		
+	
+	$self->{email} = $args->{email};
+	$self->{nom} =	$args->{nom};
+	$self->{prenom}	= $args->{prenom};
+	$self->{cc}	= $args->{cc};
+	$self->{frequency} = $args->{frequency};
 	$self->{refSites} = ();
-	$self->{lang} = $lang;
+	$self->{lang} = $args->{lang};
 
 	return $self
 }

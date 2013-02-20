@@ -13,13 +13,11 @@ use Log::Log4perl qw(:easy);
 #CONSTRUCTOR
 sub new {
 	my ($class) = shift;
+	my ($args) = shift;
 	
-	my $target = "checkingweb";
+	my $target = $args->{db};
 	
-	if( defined $_[0] && $_[0] == 1){
-		$target .= "-test";
-		INFO "### Test mode selected switch to the test db !";
-	}
+	INFO "### Database Selected : $target";
 	
 	my $self = {};	
 	bless $self, $class;
