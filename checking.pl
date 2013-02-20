@@ -111,7 +111,7 @@ while ( my @email = $emails_db->fetchrow_array() ) {
 		nom => $email[1], 
 		prenom => $email[2], 
 		cc => $email[3], 
-		frequency => $email[4]);
+		frequency => $email[4] });
 
 	my $websites_db = $db->loadWebsitesEmailAccount( $email[0] );
 
