@@ -39,7 +39,7 @@ foreach my $arg ( @ARGV ){
 	}
 	elsif( $arg =~ /-h/i ){
 		displayHelp();
-		return 1;
+		die();
 	}
 	else{
 		die("Error wrong argument passed, type -h to see help !");
