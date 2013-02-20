@@ -10,6 +10,10 @@ package Db;
 
 use Log::Log4perl qw(:easy);
 
+#TABLE DESCRIPTION
+my $TABLE_SITE = "checking_front_site"; 
+my $TABLE_KEYWORDS = "checking_front_keywords";
+my $TABLE_OPERATION = "checking_front_operation";
 #CONSTRUCTOR
 sub new {
 	my ($class) = shift;
@@ -24,7 +28,7 @@ sub new {
 		
 	$self->{_dsn}		=	"DBI:mysql:database=$target;host=localhost;port=3306;mysql_socket=/var/lib/mysql/mysql.sock";
 		
-	$self->{_db} 		=	DBI->connect($self->{_dsn}, $target, "APdzfHI7xhXmDm139x1p3T") or die "Cannot connect to Mysql";
+	$self->{_db} 		=	DBI->connect($self->{_dsn}, "root", "root") or die "Cannot connect to Mysql";
 	
 	return $self
 }
@@ -48,12 +52,28 @@ sub loadWebsitesEmailAccount {
 	$db_websites->execute( $_[0] ) or die "Cannot load websites !";
 	return $db_websites;
 }
-
+sub loadSiteFromId{
+	my ($self) = shift;
+	my ($args) = shift;
+	#Query to load one site
+	my $loadSiteFromId = "select id, address, keywords, status from $TABLE_SITE where id = ?"; 
+	my $db_site = $self->{_db}->prepare( $loadSiteFromId );
+	$db_site->execute( $args->{siteid} ) or die "Cannot load site !";
+	return $db_site->fetchrow_array();	
+}
+sub updateSiteSatus{
+	my ($self) = shift;
+	my ($args) = shift;
+	#Query to update status
+	my $updateSiteStatus = "update $TABLE_SITE set status = ? where id = ?"; 
+	my $db_updatesite = $self->{_db}->prepare( $updateSiteStatus );
+	$db_updatesite->execute( $args->{status}, $args->{id} )
+}
 #LOAD GLOBAL KEYWORDS
 sub loadkeywords {
 	my $self = shift;
 	#SQL Query load all suspicious keywords 
-	my $load_suspiciouskeywords_query = "select label from monitorServer_keywords";
+	my $load_suspiciouskeywords_query = "select label from $TABLE_KEYWORDS";
 	my $db_keywords = $self->{_db}->prepare( $load_suspiciouskeywords_query );
 	$db_keywords->execute();
 	my @keywords;
@@ -74,9 +94,9 @@ sub insert_operation {
 	my $self = shift;
 	my ($args) = $_[0];
 
-	my $insert_operation = "INSERT INTO monitorServer_operation (id_ ,dateStarted ,screenshotResult ,pingResult ,matchKeywordResult, unMatchKeywordResult 
-		,googleCodeResult ,versionCmsResult ,id_site, generatingTime, pageRank )
-		VALUES (NULL , NOW() ,  ?,  ?, NULL, NULL , ? ,  ?,  ?, ?, ?);";
+	my $insert_operation = "INSERT INTO $TABLE_OPERATION 
+			   (id   , date  ,  content, unMatchKeywords, matchKeywords, googleAna ,cms , site_id, genTime, pageRank )
+		VALUES (NULL , NOW() ,  ?      ,  ?             , ?            , ?         , ?  , ?      , ?      , ?);";
 	my $db_keywords = $self->{_db}->prepare( $insert_operation );
 	
 	if( $args->{gzip} ){
@@ -90,8 +110,7 @@ sub insert_operation {
 		INFO "gZip saved ".$gain." kBytes !";
 		$args->{content} = $content_compress;	
 	}
-	
-	$db_keywords->execute( $args->{content}, $args->{ping}, $args->{anaStatus}, $args->{cms}, $args->{id}, $args->{genTime}, $args->{pageRank});
+	$db_keywords->execute( $args->{content}, $args->{unMatchKey}, $args->{matchKey}, $args->{googleAnaStatus}, $args->{cms}, $args->{id}, $args->{genTime}, $args->{pageRank});
 }
 #LOAD OPERATION FROM ID
 sub loadScreenShotByOperationId {

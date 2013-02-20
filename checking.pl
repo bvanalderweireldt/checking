@@ -20,13 +20,11 @@ use Log::Log4perl qw(:easy);
 use MIME::Lite;
 use File::Slurp;
 
-#LOGGER
-Log::Log4perl->easy_init($INFO);
-DEBUG "Starting checking !";
 
-my $db_target = "checkingweb";
+my $db_target = "checking_dweb";
 my $gzip = 1;
 my $siteid = 0;
+my $logger = "INFO";
 foreach my $arg ( @ARGV ){
 	if( $arg =~ /db=\w+/i ){
 		$db_target = extractArg({ arg => $arg });
@@ -36,6 +34,9 @@ foreach my $arg ( @ARGV ){
 	}
 	elsif( $arg =~ /siteid=\d+/i){
 		$siteid = extractArg({ arg => $arg })
+	}
+	elsif( $arg =~ /debug=(0|1)/i ){
+		my $logger = "DEBUG";
 	}
 	elsif( $arg =~ /-h/i ){
 		displayHelp();
@@ -50,7 +51,8 @@ sub displayHelp{
 	print "Checking Help :
 	db={db+username} default=checkingweb
 	gzip={0 or 1} gzip compression for screenshot default=1
-	idsite={idsite} check only one site\n";
+	siteid={idsite} check only one site
+	debug={0 or 1} activate debug output default =1\n";
 	
 }
 
@@ -60,10 +62,41 @@ sub extractArg{
 	return  $args->{arg};
 }
 
+#LOGGER
+Log::Log4perl->easy_init($logger);
+DEBUG "Starting checking !";
+
 #Connecting to db
 INFO "Connecting to Database !";
 my $db = Db->new({ db_target => $db_target });
 
+#load general keywords to check in every website, trigger an alert in one of these keywords is found
+DEBUG "Loading global keywords !";
+my @keywords = $db->loadkeywords();
+
+#Do we just deal with one site ?
+if( $siteid != 0 ){
+	my @row = $db->loadSiteFromId( { siteid => $siteid } );
+	my $site_to_check = Site->newFromDbArray( { site => \@row } );
+	$site_to_check->setStatus( 20 );
+
+	$site_to_check->checkSite( { keywords => \@keywords } );
+
+	DEBUG "Inserting operation for website : ".$site_to_check->getAddress();
+	$db->insert_operation( { 
+		id => $site_to_check->getId(), 
+		content => $site_to_check->getContent(), 
+		cms => $site_to_check->getCms(), 
+		ping => 0, 
+		genTime => $site_to_check->getGenTime(), 
+		googleAnaStatus => $site_to_check->getGoogleAnaStatus(), 
+		pageRank => $site_to_check->getPageRank(),
+		matchKey => $site_to_check->getMatchKey(),
+		unMatchKey => $site_to_check->getUnMatchKey(),
+		gzip => $gzip });
+	$db->updateSiteSatus( { status =>  $site_to_check->getStatus(), id => $site_to_check->getId() } );
+	exit 0;
+}
 
 #LOAD EVERY WEBSITES
 DEBUG "Loading Emails !";
@@ -122,11 +155,6 @@ while ( my @email = $emails_db->fetchrow_array() ) {
 
 	push( @emails, $emailToNotify );
 }
-
-
-#load general keywords to check in every website, trigger an alert in one of these keywords is found
-DEBUG "Loading global keywords !";
-my @keywords = $db->loadkeywords();
 
 #CHECK WEBSITE
 DEBUG "Starting the main loop to check every websites !";

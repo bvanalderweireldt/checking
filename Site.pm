@@ -38,11 +38,15 @@ sub new {
 		
 	$self->{id}	= $args->{id};
 
-	$args->{address} =~ s/^http(s)?://i;
 	$self->{address} = $args->{address};
+	$self->{address} =~ s/^http(s)?://i;
 	$self->{keywords} =	$args->{keywords};
 	$self->{status}	= $args->{status};
-	
+	$self->{googleAnaStatus} = 0;
+	$self->{cms} = "";
+	$self->{unMatchKey} = "";
+	$self->{matchKey} = "";
+
 	return $self
 }
 
@@ -60,8 +64,13 @@ sub newFromDbArray{
 
 	$self->{id} = @{$args->{site}}[0];
 	$self->{address} = @{$args->{site}}[1];
+	$self->{address} =~ s/^http(s)?:\/\///i;
 	$self->{keywords} = @{$args->{site}}[2];
 	$self->{status} = @{$args->{site}}[3];
+	$self->{googleAnaStatus} = 0;
+	$self->{cms} = "";
+	$self->{unMatchKey} = "";
+	$self->{matchKey} = "";
 
 	return $self;
 }
@@ -130,7 +139,6 @@ sub scanGLobalKeywords{
 	my ($self) = shift;
 	my ($args) = shift;
 
-	$self->{matchKey} = "";
 	foreach my $global_keyword ( @{$args->{keywords}} ){
 		if ( $self->{content} =~ /.*$global_keyword.*/i ){
 			$self->{matchKey} = comaConcat( $self->{matchKey}, $global_keyword );
@@ -142,7 +150,6 @@ sub scanGLobalKeywords{
 sub scanUnMatchKeywords{
 	my ($self) = shift;
 
-	$self->{unMatchKey} = "";
 	if( defined $self->{keywords} ){
 		my @keywords_specific = split ( ";", $self->{keywords} );
 		foreach my $keyword ( @keywords_specific ){
@@ -191,40 +198,45 @@ sub detectCms{
 	#Drupal Detection
 	if ( $result =~ /(.)*drupal(.)*/i ) {
 		#Drupal 
-		return "drupal";
+		$result = "drupal";
 	}
 	elsif ( $result =~ /(.)*prestashop(.)*/i ){
 		#Prestashop
 		my $ua = new LWP::UserAgent;
 
-		my $response = $ua->post('http://presta-version.bv-blog.fr/cgi-bin/version_presta.pl', { url => $_[1] });
+		my $response = $ua->post('http://presta-version.bv-blog.fr/cgi-bin/version_presta.pl', { url => $self->{address} });
 
 		my $content = $response->content;
 
-		return "prestashop ".$content;
+		$result = "prestashop ".$content;
 	}
 	elsif ( $result =~ /(.)*joomla(.)*/i ){
 		#Joomla
-		return "joomla";
+		$result = "joomla";
 	}
 	elsif ( $result =~ /(.)*wordpress(.)*/i ){
 		#Wordpress
-		return "wordpress";
+		$result = "wordpress";
 	}
-	elsif ( $result ne "" ){
-		return $result;
-	}
+	$self->{cms} = $result;
 }
 sub checkSite{
 	my ($self) = shift;
 	my ($args) = shift;
 
+	DEBUG "Validate Url";
 	return 0 if !$self->validateUrl();
+	DEBUG "Download site";
 	return 0 if !$self->download();
+	DEBUG "Scan Global keywords";
 	$self->scanGLobalKeywords({keywords => $args->{keywords}});
+	DEBUG "Scan Expected keywords";
 	$self->scanUnMatchKeywords();
+	DEBUG "Scan Google Analytic";
 	$self->scanForGoogleAnalytic();
+	DEBUG "Detect CMS";
 	$self->detectCms();
+	DEBUG "Compute Page Rank";
 	$self->computeGooglePageRank();
 
 }
@@ -232,6 +244,14 @@ sub checkSite{
 sub comaConcat {
 	return $_[1] if( $_[0] eq "" );		
 	return $_[0].",".$_[1];
+}
+#Check if it's an unauthrorized status
+sub is_unauthorized{
+	DEBUG $_[0];
+	if( $_[0] == 401 || $_[0] == 403 ){
+		return 1;
+	}
+	return 0;	
 }
 #Setter for the status
 sub setStatus{
