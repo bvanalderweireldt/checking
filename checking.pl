@@ -47,8 +47,8 @@ foreach my $arg ( @ARGV ){
 }
 
 sub displayHelp{
-	print "Checking Help :\n
-	db={db+username} default=checkingweb\n
+	print "Checking Help :
+	db={db+username} default=checkingweb
 	gzip={0 or 1} gzip compression for screenshot default=1
 	idsite={idsite} check only one site";
 	
@@ -64,12 +64,6 @@ sub extractArg{
 INFO "Connecting to Database !";
 my $db = Db->new({ db_target => $db_target });
 
-#Enable String gZip for site content in database
-my $db_content_gZip = 1;
-if( defined $ARGV[1] && $ARGV[1] eq 'dgzip' ){
-	$db_content_gZip = 0; 
-	INFO "# gZip disable !";
-}
 
 #LOAD EVERY WEBSITES
 DEBUG "Loading Emails !";
@@ -153,7 +147,7 @@ while ( ( my $key, $_ ) = each( %sites_tested ) ){
 		genTime => $_->getGenTime(), 
 		anaStatus => $_->getGoogleAnaStatus(), 
 		pageRank => $_->getPageRank(),
-		gzip => $db_content_gZip });
+		gzip => $gzip });
 
 }
 DEBUG "End of the main scanning loop !";
