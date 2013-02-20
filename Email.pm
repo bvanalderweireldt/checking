@@ -14,6 +14,7 @@ my $lang = "fr";
 
 #CONSTRUCTOR
 sub new {
+	my $class = shift;
 	my ($args) = shift;
 	my $self = {};	
 	bless $self, $class;
