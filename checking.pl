@@ -39,7 +39,7 @@ foreach my $arg ( @ARGV ){
 	}
 	elsif( $arg =~ /-h/i ){
 		displayHelp();
-		die();
+		return 0;
 	}
 	else{
 		die("Error wrong argument passed, type -h to see help !");
@@ -50,7 +50,7 @@ sub displayHelp{
 	print "Checking Help :
 	db={db+username} default=checkingweb
 	gzip={0 or 1} gzip compression for screenshot default=1
-	idsite={idsite} check only one site";
+	idsite={idsite} check only one site\n";
 	
 }
 
