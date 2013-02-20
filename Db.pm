@@ -15,7 +15,7 @@ sub new {
 	my ($class) = shift;
 	my ($args) = shift;
 	
-	my $target = $args->{db};
+	my $target = $args->{db_target};
 	
 	INFO "### Database Selected : $target";
 	

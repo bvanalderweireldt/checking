@@ -62,7 +62,7 @@ sub extractArg{
 
 #Connecting to db
 INFO "Connecting to Database !";
-my $db = Db->new($db_target);
+my $db = Db->new({ db_target => $db_target });
 
 #Enable String gZip for site content in database
 my $db_content_gZip = 1;
