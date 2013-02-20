@@ -24,7 +24,7 @@ use File::Slurp;
 Log::Log4perl->easy_init($INFO);
 DEBUG "Starting checking !";
 
-my $db = "checkingweb";
+my $db_target = "checkingweb";
 my $gzip = 1;
 my $siteid = 0;
 foreach my $arg ( @ARGV ){
@@ -62,7 +62,7 @@ sub extractArg{
 
 #Connecting to db
 INFO "Connecting to Database !";
-my $db = Db->new($db);
+my $db = Db->new($db_target);
 
 #Enable String gZip for site content in database
 my $db_content_gZip = 1;
