@@ -29,7 +29,7 @@ my $gzip = 1;
 my $siteid = 0;
 foreach my $arg ( @ARGV ){
 	if( $arg =~ /db=\w+/i ){
-		$db = extractArg({ arg => $arg });
+		$db_target = extractArg({ arg => $arg });
 	}
 	elsif( $arg =~ /gzip=(0|1)/i ){
 		$gzip = extractArg({ arg => $arg });
