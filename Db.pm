@@ -95,8 +95,8 @@ sub insert_operation {
 	my ($args) = $_[0];
 
 	my $insert_operation = "INSERT INTO $TABLE_OPERATION 
-			   (id   , date  ,  content, unMatchKeywords, matchKeywords, googleAna ,cms , site_id, genTime, pageRank )
-		VALUES (NULL , NOW() ,  ?      ,  ?             , ?            , ?         , ?  , ?      , ?      , ?);";
+			   (id   , date  ,  content, unMatchKeywords, matchKeywords, googleAna ,cms , site_id, genTime, pageRank, status )
+		VALUES (NULL , NOW() ,  ?      ,  ?             , ?            , ?         , ?  , ?      , ?      , ?		, ?);";
 	my $db_keywords = $self->{_db}->prepare( $insert_operation );
 	
 	if( $args->{gzip} ){
@@ -110,15 +110,14 @@ sub insert_operation {
 		INFO "gZip saved ".$gain." kBytes !";
 		$args->{content} = $content_compress;	
 	}
-	$db_keywords->execute( $args->{content}, $args->{unMatchKey}, $args->{matchKey}, $args->{googleAnaStatus}, $args->{cms}, $args->{id}, $args->{genTime}, $args->{pageRank});
+	$db_keywords->execute( $args->{content}, $args->{unMatchKey}, $args->{matchKey}, $args->{googleAnaStatus}, $args->{cms}, $args->{id}, $args->{genTime}, $args->{pageRank}, $args->{status});
 }
 #LOAD OPERATION FROM ID
 sub loadScreenShotByOperationId {
 	my $self = shift;
 	my ($args) = shift;
 	
-	my $loadScreenShotByOperationId = "select screenshotResult from monitorServer_operation where id_ = ".$args->{id};
-	INFO $loadScreenShotByOperationId;
+	my $loadScreenShotByOperationId = "select content from $TABLE_OPERATION where id = ".$args->{id};
 	my ( $screenshot ) = $self->{_db}->selectrow_array( $loadScreenShotByOperationId );
 	return $screenshot;
 }

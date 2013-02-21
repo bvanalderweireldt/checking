@@ -253,6 +253,24 @@ sub is_unauthorized{
 	}
 	return 0;	
 }
+#Save operation in DB
+sub save_operation{
+	my ($self) = shift;
+	my ($args) = shift;
+	
+	$args->{db}->insert_operation( { 
+		id => $self->getId(), 
+		content => $self->getContent(), 
+		cms => $self->getCms(), 
+		ping => 0, 
+		genTime => $self->getGenTime(), 
+		googleAnaStatus => $self->getGoogleAnaStatus(), 
+		pageRank => $self->getPageRank(),
+		matchKey => $self->getMatchKey(),
+		unMatchKey => $self->getUnMatchKey(),
+		gzip => $args->{gzip},
+		status => $self->getStatus() });
+}
 #Setter for the status
 sub setStatus{
 	my $self = shift;

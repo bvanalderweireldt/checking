@@ -83,17 +83,7 @@ if( $siteid != 0 ){
 	$site_to_check->checkSite( { keywords => \@keywords } );
 
 	DEBUG "Inserting operation for website : ".$site_to_check->getAddress();
-	$db->insert_operation( { 
-		id => $site_to_check->getId(), 
-		content => $site_to_check->getContent(), 
-		cms => $site_to_check->getCms(), 
-		ping => 0, 
-		genTime => $site_to_check->getGenTime(), 
-		googleAnaStatus => $site_to_check->getGoogleAnaStatus(), 
-		pageRank => $site_to_check->getPageRank(),
-		matchKey => $site_to_check->getMatchKey(),
-		unMatchKey => $site_to_check->getUnMatchKey(),
-		gzip => $gzip });
+	$site_to_check->save_operation( { db => $db, gzip => $gzip } );
 	$db->updateSiteSatus( { status =>  $site_to_check->getStatus(), id => $site_to_check->getId() } );
 	exit 0;
 }
@@ -167,16 +157,7 @@ while ( ( my $key, $_ ) = each( %sites_tested ) ){
 	$_->checkSite( { keywords => \@keywords } );
 
 	DEBUG "Inserting operation for website : ".$_->getAddress();
-	$db->insert_operation( { 
-		id => $_->getId(), 
-		content => $_->getContent(), 
-		cms => $_->getCms(), 
-		ping => 0, 
-		genTime => $_->getGenTime(), 
-		anaStatus => $_->getGoogleAnaStatus(), 
-		pageRank => $_->getPageRank(),
-		gzip => $gzip });
-
+	$_->save_operation( { db => $db, gzip => $gzip } );
 }
 DEBUG "End of the main scanning loop !";
 
