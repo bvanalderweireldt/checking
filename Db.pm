@@ -14,6 +14,8 @@ use Log::Log4perl qw(:easy);
 my $TABLE_SITE = "checking_front_site"; 
 my $TABLE_KEYWORDS = "checking_front_keywords";
 my $TABLE_OPERATION = "checking_front_operation";
+my $TABLE_USER = "auth_user";
+my $TABLE_USER_PROFILE = "checking_front_userprofile";
 #CONSTRUCTOR
 sub new {
 	my ($class) = shift;
@@ -36,7 +38,7 @@ sub new {
 sub loadEmails {
 	my $self = shift;
 	#SQL Query load every emails
-	my $load_all_emails_query = "select email, nom, prenom, cc, frequency from monitorServer_email";
+	my $load_all_emails_query = "select email, first_name, last_name, cc, frequency from $TABLE_USER as a right join $TABLE_USER_PROFILE as up on a.id = up.user_id";
 	my $db_emails = $self->{_db}->prepare( $load_all_emails_query );
 	$db_emails->execute() or die "Cannot load emails !";
 	return $db_emails;
