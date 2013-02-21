@@ -175,7 +175,7 @@ sub scanForGoogleAnalytic{
 sub computeGooglePageRank{
 	my ($self) = shift;
 	my $pr = WWW::Google::PageRank->new;
-	$self->{pageRank} = $pr->get( $self->{address}, $self->{address} );
+	$self->{pageRank} = scalar($pr->get($protocol.$self->{address}, "\n" ));
 }
 #Try to guess if the site is running a CMS
 sub detectCms{
