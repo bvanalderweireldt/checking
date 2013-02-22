@@ -30,7 +30,7 @@ sub new {
 		
 	$self->{_dsn}		=	"DBI:mysql:database=$target;host=localhost;port=3306;mysql_socket=/var/lib/mysql/mysql.sock";
 		
-	$self->{_db} 		=	DBI->connect($self->{_dsn}, "root", "root") or die "Cannot connect to Mysql";
+	$self->{_db} 		=	DBI->connect($self->{_dsn}, "checking_dweb", "checking_dweb") or die "Cannot connect to Mysql";
 	
 	return $self
 }
