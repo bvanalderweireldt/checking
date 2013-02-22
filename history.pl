@@ -9,7 +9,6 @@ BEGIN{
 }
 
 use Db;
-use IO::Uncompress::Gunzip qw(gunzip $GunzipError) ;
 
 my $idoperation = $ARGV[0];
 
@@ -19,12 +18,12 @@ my $db_target = "checking_dweb";
 
 my $db = Db->new( { db_target => $db_target } );
 
-my $screenshot = $db->loadScreenShotByOperationId({ id => $idoperation });
+my $content = $db->loadContentOperationId({ id => $idoperation });
 
-my $uncompressedScreenshot;
+if( $content =~ /^\d+$/ ){
+	$content = $db->loadContentOperationId({ id => $content });
+}
 
-gunzip \$screenshot => \$uncompressedScreenshot;
-
-print $uncompressedScreenshot;
+print $content;
 
 

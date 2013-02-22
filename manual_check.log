@@ -37,3 +37,97 @@
 2013/02/21 04:25:55 Compute Page Rank
 2013/02/21 04:25:55 Inserting operation for website : bv-blog.fr/
 2013/02/21 04:25:55 gZip saved 32.102 kBytes !
+2013/02/21 20:03:00 Starting checking !
+2013/02/21 20:03:00 Connecting to Database !
+2013/02/21 20:03:00 ### Database Selected : checking_dweb
+2013/02/21 20:03:00 Loading global keywords !
+2013/02/21 20:03:00 Validate Url
+2013/02/21 20:03:00 Download site
+2013/02/21 20:03:03 Scan Global keywords
+2013/02/21 20:03:03 Scan Expected keywords
+2013/02/21 20:03:03 Scan Google Analytic
+2013/02/21 20:03:03 Detect CMS
+2013/02/21 20:03:03 Compute Page Rank
+2013/02/21 20:03:03 Inserting operation for website : bv-blog.fr/
+2013/02/21 20:03:03 gZip saved 32.106 kBytes !
+2013/02/21 20:09:18 Starting checking !
+2013/02/21 20:09:18 Connecting to Database !
+2013/02/21 20:09:18 ### Database Selected : checking_dweb
+2013/02/21 20:09:18 Loading global keywords !
+2013/02/21 20:09:18 Validate Url
+2013/02/21 20:09:18 Download site
+2013/02/21 20:09:21 Scan Global keywords
+2013/02/21 20:09:21 Scan Expected keywords
+2013/02/21 20:09:21 Scan Google Analytic
+2013/02/21 20:09:33 Detect CMS
+2013/02/21 20:09:34 Compute Page Rank
+2013/02/21 20:09:34 Inserting operation for website : lemonde.fr/
+2013/02/21 20:09:34 gZip saved 214.106 kBytes !
+2013/02/21 20:10:58 Starting checking !
+2013/02/21 20:10:58 Connecting to Database !
+2013/02/21 20:10:58 ### Database Selected : checking_dweb
+2013/02/21 20:10:58 Loading global keywords !
+2013/02/21 20:10:58 Validate Url
+2013/02/21 20:10:58 Download site
+2013/02/21 20:10:59 Scan Global keywords
+2013/02/21 20:10:59 Scan Expected keywords
+2013/02/21 20:10:59 Scan Google Analytic
+2013/02/21 20:10:59 Detect CMS
+2013/02/21 20:10:59 Compute Page Rank
+2013/02/21 20:10:59 Inserting operation for website : web-mining.eu/
+2013/02/21 20:10:59 gZip saved 0.854 kBytes !
+2013/02/21 21:18:10 Starting checking !
+2013/02/21 21:18:10 Connecting to Database !
+2013/02/21 21:18:10 ### Database Selected : checking_dweb
+2013/02/21 21:18:10 Loading global keywords !
+2013/02/21 21:18:10 Validate Url
+2013/02/21 21:18:10 Download site
+2013/02/21 21:18:12 Scan Global keywords
+2013/02/21 21:18:12 Scan Expected keywords
+2013/02/21 21:18:12 Scan Google Analytic
+2013/02/21 21:18:12 Detect CMS
+2013/02/21 21:18:12 Compute Page Rank
+2013/02/21 21:18:12 Inserting operation for website : web-mining.eu/
+2013/02/21 21:18:12 gZip saved 0.456 kBytes !
+2013/02/21 22:21:36 Starting checking !
+2013/02/21 22:21:36 Connecting to Database !
+2013/02/21 22:21:36 ### Database Selected : checking_dweb
+2013/02/21 22:21:36 Loading global keywords !
+2013/02/21 22:21:36 Validate Url
+2013/02/21 22:21:36 Download site
+2013/02/21 22:21:38 Scan Global keywords
+2013/02/21 22:21:38 Scan Expected keywords
+2013/02/21 22:21:38 Scan Google Analytic
+2013/02/21 22:21:38 Detect CMS
+2013/02/21 22:21:38 Compute Page Rank
+2013/02/21 22:21:38 Inserting operation for website : www.bv-blog.fr/search/node/java
+2013/02/21 22:21:38 New content will be stored in DB !
+2013/02/21 22:21:38 gZip saved 13.327 kBytes !
+2013/02/22 00:10:04 Starting checking !
+2013/02/22 00:10:04 Connecting to Database !
+2013/02/22 00:10:04 ### Database Selected : checking_dweb
+2013/02/22 00:10:04 Loading global keywords !
+2013/02/22 00:10:04 Validate Url
+2013/02/22 00:10:04 Download site
+2013/02/22 00:10:06 Scan Global keywords
+2013/02/22 00:10:06 Scan Expected keywords
+2013/02/22 00:10:06 Scan Google Analytic
+2013/02/22 00:10:06 Detect CMS
+2013/02/22 00:10:06 Compute Page Rank
+2013/02/22 00:10:06 Inserting operation for website : www.bv-blog.fr/
+2013/02/22 00:10:06 New content will be stored in DB !
+2013/02/22 00:10:06 gZip saved 31.706 kBytes !
+2013/02/22 03:00:24 Starting checking !
+2013/02/22 03:00:24 Connecting to Database !
+2013/02/22 03:00:24 ### Database Selected : checking_dweb
+2013/02/22 03:00:24 Loading global keywords !
+2013/02/22 03:00:24 Validate Url
+2013/02/22 03:00:24 Download site
+2013/02/22 03:00:28 Scan Global keywords
+2013/02/22 03:00:28 Scan Expected keywords
+2013/02/22 03:00:28 Scan Google Analytic
+2013/02/22 03:00:28 Detect CMS
+2013/02/22 03:00:28 Compute Page Rank
+2013/02/22 03:00:28 Inserting operation for website : www.bv-blog.fr/
+2013/02/22 03:00:28 New content will be stored in DB !
+2013/02/22 03:00:28 gZip saved 31.7 kBytes !

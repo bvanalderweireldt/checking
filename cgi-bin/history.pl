@@ -11,8 +11,6 @@ BEGIN{
 
 use Db;
 use CGI;
-use POSIX qw/strftime/;
-use IO::Uncompress::Gunzip qw(gunzip $GunzipError) ;
 
 #Request handler
 my $req = CGI->new;
@@ -28,12 +26,12 @@ print ( "You need to provide an ID to get an operation screenshot !\n") and die(
 
 my $db = Db->new($req->param('test'));
 
-my $screenshot = $db->loadScreenShotByOperationId({ id => $req->param('id') });
+my $content = $db->loadContentOperationId({ id => $req->param('id') });
 
-my $uncompressedScreenshot;
+if( $content =~ /^\d+$/ ){
+	$content = $db->loadContentOperationId({ id => $content });
+}
 
-gunzip \$screenshot => \$uncompressedScreenshot;
-
-print $uncompressedScreenshot;
+print $content;
 
 

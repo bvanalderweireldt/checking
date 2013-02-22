@@ -77,6 +77,7 @@ my @keywords = $db->loadkeywords();
 #Do we just deal with one site ?
 if( $siteid != 0 ){
 	my @row = $db->loadSiteFromId( { siteid => $siteid } );
+	die("Empty Site ?") if !@row; 
 	my $site_to_check = Site->newFromDbArray( { site => \@row } );
 	$site_to_check->setStatus( 20 );
 
@@ -130,7 +131,7 @@ while ( my @email = $emails_db->fetchrow_array() ) {
 		cc => $email[3], 
 		frequency => $email[4] });
 
-	my $websites_db = $db->loadWebsitesEmailAccount( $email[0] );
+	my $websites_db = $db->loadWebsitesEmailAccount( { user_id => $email[5] } );
 
 	while ( my @website = $websites_db->fetchrow_array() ){
 		DEBUG "_Found one website link to ".$email[0]." : ".$website[1];
@@ -189,7 +190,7 @@ foreach my $email_account ( @emails ){
 	}
 	
 	my $msg = MIME::Lite->new(
-	             From     => 'checking@webmining.eu',
+	             From     => '',
 	             To       => $email_account->getEmail(),
 	             Cc       => $cc,
 	             Subject  => "WebSite Checking",
@@ -197,5 +198,5 @@ foreach my $email_account ( @emails ){
 	             Type	  => "text/html; charset=iso-8859-1"
 	             );
 	
-	$msg->send;
+	DEBUG $msg->send;
 }

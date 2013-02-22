@@ -114,7 +114,7 @@ sub download{
 
 	my($timeStart) = [gettimeofday()];
 	my $response = $ua->get( $protocol.$self->{address} );
-	$self->{content} = $response->as_string ;
+	$self->{content} = $response->content ;
 	my($timeElapsed) = tv_interval($timeStart, [gettimeofday()]);
 	$self->{genTime} = ( $timeElapsed * 1000 );
 
@@ -237,7 +237,7 @@ sub checkSite{
 	DEBUG "Detect CMS";
 	$self->detectCms();
 	DEBUG "Compute Page Rank";
-	$self->computeGooglePageRank();
+	#$self->computeGooglePageRank();
 
 }
 #Concat 2 string, if the left string is not null we add a coma between them
@@ -258,6 +258,8 @@ sub save_operation{
 	my ($self) = shift;
 	my ($args) = shift;
 	
+	$self->toggleContentOrIdOperation( { db => $args->{db} } );
+
 	$args->{db}->insert_operation( { 
 		id => $self->getId(), 
 		content => $self->getContent(), 
@@ -270,6 +272,31 @@ sub save_operation{
 		unMatchKey => $self->getUnMatchKey(),
 		gzip => $args->{gzip},
 		status => $self->getStatus() });
+}
+#Toggle the content to an operation id if it haven't changed since last checking
+sub toggleContentOrIdOperation{
+	my ($self) = shift;
+	my ($args) = shift;
+	
+	my $last_content = $args->{db}->loadLastContentFromSiteid( { siteid => $self->{id} } );
+	my $id_content = "";
+	
+	#If the content refer to a id
+	if( $last_content =~ /^\d+$/ ){
+		$id_content = $last_content;
+		$last_content = $args->{db}->loadContentOperationId( { id => $id_content } );
+	}
+	
+	if( $last_content ne $self->{content} ){
+		DEBUG "New content will be stored in DB !";
+	}
+	else{
+		if( $id_content eq "" ){
+			$id_content = $args->{db}->loadLastOperationIdFromSiteid(  { siteid => $self->{id} } );
+		}
+		DEBUG "Content haven't changed will make reference to the content already saved ! ($id_content)";
+		$self->{content} = $id_content;
+	}
 }
 #Setter for the status
 sub setStatus{

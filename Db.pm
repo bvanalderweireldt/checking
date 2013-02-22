@@ -38,20 +38,20 @@ sub new {
 sub loadEmails {
 	my $self = shift;
 	#SQL Query load every emails
-	my $load_all_emails_query = "select email, first_name, last_name, cc, frequency from $TABLE_USER as a right join $TABLE_USER_PROFILE as up on a.id = up.user_id";
+	my $load_all_emails_query = "select email, first_name, last_name, cc, frequency, user_id from $TABLE_USER as a right join $TABLE_USER_PROFILE as up on a.id = up.user_id";
 	my $db_emails = $self->{_db}->prepare( $load_all_emails_query );
 	$db_emails->execute() or die "Cannot load emails !";
 	return $db_emails;
 }
 #LOAD ACTIVATE WEBSITES OF A GIVEN EMAIL ACCOUNT
 sub loadWebsitesEmailAccount {
-	my $self = shift;
+	my ($self) = shift;
+	my ($args) = shift;
 	#SQL Query load all websites
-	my $load_websites_query = "select id, label, keywords, status 
-	from monitorServer_site as s right join monitorServer_email_has_sites as hs on s.id = hs.id_site where label != '' and monitor=1 
-	and hs.email = ?";
+	my $load_websites_query = "select id, address, keywords, status 
+	from $TABLE_SITE  where monitor=1 and user_id = ?";
 	my $db_websites = $self->{_db}->prepare( $load_websites_query );
-	$db_websites->execute( $_[0] ) or die "Cannot load websites !";
+	$db_websites->execute( $args->{user_id} ) or die "Cannot load websites !";
 	return $db_websites;
 }
 sub loadSiteFromId{
@@ -84,12 +84,27 @@ sub loadkeywords {
 	}
 	return @keywords;
 }
-#Query load the last recorded screenshot
-sub loadscreenshot {
-	my $self = shift;
-	my $load_last_screenshot = "select screenshotResult from monitorServer_operation where id_site = ".$_[0]." order by dateStarted desc limit 0,1;";
-	my ( $screenshot ) = $self->{_db}->selectrow_array( $load_last_screenshot );
-	return $screenshot;
+#Query load the last recorded content
+sub loadLastContentFromSiteid {
+	my ($self) = shift;
+	my ($args) = shift;
+	my $load_last_screenshot = "select content from $TABLE_OPERATION where site_id = ? order by date desc limit 0,1;";
+	my ( $content ) = $self->{_db}->selectrow_array( $load_last_screenshot, undef, $args->{siteid} );
+
+	use IO::Uncompress::Gunzip qw(gunzip $GunzipError) ;
+	my $uncompressedScreenshot;
+
+	gunzip \$content => \$uncompressedScreenshot;
+	
+	return $uncompressedScreenshot;
+}
+sub loadLastOperationIdFromSiteid {
+	my ($self) = shift;
+	my ($args) = shift;
+	my $load_last_screenshot = "select id from $TABLE_OPERATION where site_id = ? order by date desc limit 0,1;";
+	my ( $id ) = $self->{_db}->selectrow_array( $load_last_screenshot, undef, $args->{siteid} );
+
+	return $id;
 }
 #INSERT ONE OPERATION IN DB
 sub insert_operation {
@@ -100,7 +115,7 @@ sub insert_operation {
 			   (id   , date  ,  content, unMatchKeywords, matchKeywords, googleAna ,cms , site_id, genTime, pageRank, status )
 		VALUES (NULL , NOW() ,  ?      ,  ?             , ?            , ?         , ?  , ?      , ?      , ?		, ?);";
 	my $db_keywords = $self->{_db}->prepare( $insert_operation );
-	
+
 	if( $args->{gzip} ){
 		use IO::Compress::Gzip qw(gzip $GzipError) ;
 		my $content_compress;
@@ -111,16 +126,22 @@ sub insert_operation {
 		my $gain = (length($args->{content}) - length($content_compress)) / 1000;
 		INFO "gZip saved ".$gain." kBytes !";
 		$args->{content} = $content_compress;	
-	}
+	} 
 	$db_keywords->execute( $args->{content}, $args->{unMatchKey}, $args->{matchKey}, $args->{googleAnaStatus}, $args->{cms}, $args->{id}, $args->{genTime}, $args->{pageRank}, $args->{status});
 }
 #LOAD OPERATION FROM ID
-sub loadScreenShotByOperationId {
+sub loadContentOperationId {
 	my $self = shift;
 	my ($args) = shift;
 	
 	my $loadScreenShotByOperationId = "select content from $TABLE_OPERATION where id = ".$args->{id};
-	my ( $screenshot ) = $self->{_db}->selectrow_array( $loadScreenShotByOperationId );
-	return $screenshot;
+	my ( $content ) = $self->{_db}->selectrow_array( $loadScreenShotByOperationId );
+	
+	use IO::Uncompress::Gunzip qw(gunzip $GunzipError) ;
+	my $uncompressedScreenshot;
+
+	gunzip \$content => \$uncompressedScreenshot;
+
+	return $uncompressedScreenshot;
 }
 1;
