@@ -131,3 +131,159 @@
 2013/02/22 03:00:28 Inserting operation for website : www.bv-blog.fr/
 2013/02/22 03:00:28 New content will be stored in DB !
 2013/02/22 03:00:28 gZip saved 31.7 kBytes !
+2013/02/23 03:20:28 Starting checking !
+2013/02/23 03:20:28 Connecting to Database !
+2013/02/23 03:20:28 ### Database Selected : checking_dweb
+DBI connect('database=checking_dweb;host=localhost;port=3306;mysql_socket=/var/lib/mysql/mysql.sock','checking_dweb',...) failed: Access denied for user 'checking_dweb'@'localhost' (using password: YES) at /home/checking/checking-beta/./Db.pm line 33.
+Cannot connect to Mysql at /home/checking/checking-beta/./Db.pm line 33.
+2013/02/23 03:20:35 Starting checking !
+2013/02/23 03:20:35 Connecting to Database !
+2013/02/23 03:20:35 ### Database Selected : checking_dweb
+DBI connect('database=checking_dweb;host=localhost;port=3306;mysql_socket=/var/lib/mysql/mysql.sock','checking_dweb',...) failed: Access denied for user 'checking_dweb'@'localhost' (using password: YES) at /home/checking/checking-beta/./Db.pm line 33.
+Cannot connect to Mysql at /home/checking/checking-beta/./Db.pm line 33.
+2013/02/23 03:22:51 Starting checking !
+2013/02/23 03:22:51 Connecting to Database !
+2013/02/23 03:22:51 ### Database Selected : checking_dweb
+DBI connect('database=checking_dweb;host=localhost;port=3306;mysql_socket=/var/lib/mysql/mysql.sock','checking_dweb',...) failed: Access denied for user 'checking_dweb'@'localhost' (using password: YES) at /home/checking/checking-beta/./Db.pm line 33.
+Cannot connect to Mysql at /home/checking/checking-beta/./Db.pm line 33.
+2013/02/23 03:26:17 Starting checking !
+2013/02/23 03:26:17 Connecting to Database !
+2013/02/23 03:26:17 ### Database Selected : checking_dweb
+DBI connect('database=checking_dweb;host=localhost;port=3306;mysql_socket=/var/lib/mysql/mysql.sock','checking_dweb',...) failed: Access denied for user 'checking_dweb'@'localhost' (using password: YES) at /home/checking/checking-beta/./Db.pm line 33.
+Cannot connect to Mysql at /home/checking/checking-beta/./Db.pm line 33.
+2013/02/23 03:26:35 Starting checking !
+2013/02/23 03:26:35 Connecting to Database !
+2013/02/23 03:26:35 ### Database Selected : checking_dweb
+DBI connect('database=checking_dweb;host=localhost;port=3306;mysql_socket=/var/lib/mysql/mysql.sock','checking_dweb',...) failed: Access denied for user 'checking_dweb'@'localhost' (using password: YES) at /home/checking/checking-beta/./Db.pm line 33.
+Cannot connect to Mysql at /home/checking/checking-beta/./Db.pm line 33.
+2013/02/23 03:26:58 Starting checking !
+2013/02/23 03:26:58 Connecting to Database !
+2013/02/23 03:26:58 ### Database Selected : checking_dweb
+DBI connect('database=checking_dweb;host=localhost;port=3306;mysql_socket=/var/lib/mysql/mysql.sock','checking_dweb',...) failed: Access denied for user 'checking_dweb'@'localhost' (using password: YES) at /home/checking/checking-beta/./Db.pm line 33.
+Cannot connect to Mysql at /home/checking/checking-beta/./Db.pm line 33.
+2013/02/23 03:27:37 Starting checking !
+2013/02/23 03:27:37 Connecting to Database !
+2013/02/23 03:27:37 ### Database Selected : checking_dweb
+2013/02/23 03:27:37 Loading global keywords !
+2013/02/23 03:27:37 Validate Url
+2013/02/23 03:27:37 Download site
+2013/02/23 03:27:58 500
+2013/02/23 03:27:58 Inserting operation for website : www.bv-blog.fr/
+2013/02/23 03:27:58 New content will be stored in DB !
+2013/02/23 03:27:58 gZip saved 0.023 kBytes !
+2013/02/23 03:29:28 Starting checking !
+2013/02/23 03:29:28 Connecting to Database !
+2013/02/23 03:29:28 ### Database Selected : checking_dweb
+2013/02/23 03:29:28 Loading global keywords !
+2013/02/23 03:29:28 Validate Url
+2013/02/23 03:29:28 Download site
+2013/02/23 03:29:48 500
+2013/02/23 03:29:48 Inserting operation for website : www.bv-blog.fr/
+2013/02/23 03:29:48 Content haven't changed will make reference to the content already saved ! (2)
+2013/02/23 03:29:48 gZip saved -0.02 kBytes !
+2013/02/23 03:30:31 Starting checking !
+2013/02/23 03:30:31 Connecting to Database !
+2013/02/23 03:30:31 ### Database Selected : checking_dweb
+2013/02/23 03:30:31 Loading global keywords !
+2013/02/23 03:30:31 Validate Url
+2013/02/23 03:30:31 Download site
+2013/02/23 03:30:51 500
+2013/02/23 03:30:51 Inserting operation for website : bv-blog.fr/
+2013/02/23 03:30:51 New content will be stored in DB !
+2013/02/23 03:30:51 gZip saved 0.019 kBytes !
+2013/02/23 03:41:54 Starting checking !
+2013/02/23 03:41:54 Connecting to Database !
+2013/02/23 03:41:54 ### Database Selected : checking_dweb
+2013/02/23 03:41:54 Loading global keywords !
+2013/02/23 03:41:54 Start check for : bv-blog.fr
+2013/02/23 03:41:54 Validate Url
+2013/02/23 03:41:54 Download site
+2013/02/23 03:41:54 http://bv-blog.fr
+2013/02/23 03:41:56 Scan Global keywords
+2013/02/23 03:41:56 Scan Expected keywords
+2013/02/23 03:41:56 Scan Google Analytic
+2013/02/23 03:41:56 Detect CMS
+2013/02/23 03:41:56 Compute Page Rank
+2013/02/23 03:41:56 Inserting operation for website : bv-blog.fr
+2013/02/23 03:41:56 New content will be stored in DB !
+2013/02/23 03:41:56 gZip saved 31.609 kBytes !
+2013/02/23 04:14:50 Starting checking !
+2013/02/23 04:14:50 Connecting to Database !
+2013/02/23 04:14:50 ### Database Selected : checking_dweb
+2013/02/23 04:14:50 Loading global keywords !
+2013/02/23 04:14:50 Start check for : bv-blog.fr
+2013/02/23 04:14:50 Validate Url
+2013/02/23 04:14:50 Download site
+2013/02/23 04:14:50 http://bv-blog.fr
+2013/02/23 04:15:18 Scan Global keywords
+2013/02/23 04:15:18 Scan Expected keywords
+2013/02/23 04:15:18 Scan Google Analytic
+2013/02/23 04:15:18 Detect CMS
+2013/02/23 04:15:18 Compute Page Rank
+2013/02/23 04:15:18 Inserting operation for website : bv-blog.fr
+2013/02/23 04:15:18 Content haven't changed will make reference to the content already saved ! (9)
+2013/02/23 04:15:18 gZip saved -0.02 kBytes !
+2013/02/23 04:26:36 Starting checking !
+2013/02/23 04:26:36 Connecting to Database !
+2013/02/23 04:26:36 ### Database Selected : checking_dweb
+2013/02/23 04:26:36 Loading global keywords !
+2013/02/23 04:26:36 Start check for : bv-blog.fr
+2013/02/23 04:26:36 Validate Url
+2013/02/23 04:26:36 Download site
+2013/02/23 04:26:36 http://bv-blog.fr
+2013/02/23 04:26:41 Scan Global keywords
+2013/02/23 04:26:41 Scan Expected keywords
+2013/02/23 04:26:41 Scan Google Analytic
+2013/02/23 04:26:41 Detect CMS
+2013/02/23 04:26:41 Compute Page Rank
+2013/02/23 04:26:41 Inserting operation for website : bv-blog.fr
+2013/02/23 04:26:41 Content haven't changed will make reference to the content already saved ! (9)
+2013/02/23 04:26:41 gZip saved -0.02 kBytes !
+2013/02/23 04:46:21 Starting checking !
+2013/02/23 04:46:21 Connecting to Database !
+2013/02/23 04:46:21 ### Database Selected : checking_dweb
+2013/02/23 04:46:21 Loading global keywords !
+2013/02/23 04:46:21 Start check for : paratamtam.com
+2013/02/23 04:46:21 Validate Url
+2013/02/23 04:46:21 Download site
+2013/02/23 04:46:21 http://paratamtam.com
+2013/02/23 04:46:25 Scan Global keywords
+2013/02/23 04:46:25 Scan Expected keywords
+2013/02/23 04:46:25 Scan Google Analytic
+2013/02/23 04:46:25 Detect CMS
+2013/02/23 04:46:28 Compute Page Rank
+2013/02/23 04:46:28 Inserting operation for website : paratamtam.com
+2013/02/23 04:46:28 New content will be stored in DB !
+2013/02/23 04:46:28 gZip saved 94.193 kBytes !
+2013/02/23 11:30:30 Starting checking !
+2013/02/23 11:30:30 Connecting to Database !
+2013/02/23 11:30:30 ### Database Selected : checking_dweb
+2013/02/23 11:30:30 Loading global keywords !
+2013/02/23 11:30:30 Start check for : www.bv-blog.fr
+2013/02/23 11:30:30 Validate Url
+2013/02/23 11:30:30 Download site
+2013/02/23 11:30:30 http://www.bv-blog.fr
+2013/02/23 11:30:33 Scan Global keywords
+2013/02/23 11:30:33 Scan Expected keywords
+2013/02/23 11:30:33 Scan Google Analytic
+2013/02/23 11:30:33 Detect CMS
+2013/02/23 11:30:33 Compute Page Rank
+2013/02/23 11:30:33 Inserting operation for website : www.bv-blog.fr
+2013/02/23 11:30:33 New content will be stored in DB !
+2013/02/23 11:30:33 gZip saved 31.707 kBytes !
+2013/02/23 11:31:25 Starting checking !
+2013/02/23 11:31:25 Connecting to Database !
+2013/02/23 11:31:25 ### Database Selected : checking_dweb
+2013/02/23 11:31:25 Loading global keywords !
+2013/02/23 11:31:25 Start check for : www.bv-blog.fr
+2013/02/23 11:31:25 Validate Url
+2013/02/23 11:31:25 Download site
+2013/02/23 11:31:25 http://www.bv-blog.fr
+2013/02/23 11:31:28 Scan Global keywords
+2013/02/23 11:31:28 Scan Expected keywords
+2013/02/23 11:31:28 Scan Google Analytic
+2013/02/23 11:31:28 Detect CMS
+2013/02/23 11:31:28 Compute Page Rank
+2013/02/23 11:31:28 Inserting operation for website : www.bv-blog.fr
+2013/02/23 11:31:28 Content haven't changed will make reference to the content already saved ! (1)
+2013/02/23 11:31:28 gZip saved -0.02 kBytes !

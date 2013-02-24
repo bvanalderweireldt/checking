@@ -13,6 +13,7 @@ use LWP::UserAgent;
 use Time::HiRes qw(tv_interval gettimeofday);
 use WWW::Google::PageRank;
 use Mojo::DOM;
+use Socket;
 use Log::Log4perl qw(:easy);
 Log::Log4perl->easy_init($DEBUG);
 use Properties;
@@ -40,12 +41,14 @@ sub new {
 
 	$self->{address} = $args->{address};
 	$self->{address} =~ s/^http(s)?://i;
+	$self->{address} =~ s/\/$//;
 	$self->{keywords} =	$args->{keywords};
 	$self->{status}	= $args->{status};
 	$self->{googleAnaStatus} = 0;
 	$self->{cms} = "";
 	$self->{unMatchKey} = "";
 	$self->{matchKey} = "";
+	$self->{ip} = 0;
 
 	return $self
 }
@@ -65,6 +68,7 @@ sub newFromDbArray{
 	$self->{id} = @{$args->{site}}[0];
 	$self->{address} = @{$args->{site}}[1];
 	$self->{address} =~ s/^http(s)?:\/\///i;
+	$self->{address} =~ s/\/$//;
 	$self->{keywords} = @{$args->{site}}[2];
 	$self->{status} = @{$args->{site}}[3];
 	$self->{googleAnaStatus} = 0;
@@ -113,6 +117,7 @@ sub download{
 	my ($self) = shift;
 
 	my($timeStart) = [gettimeofday()];
+	DEBUG $protocol.$self->{address};
 	my $response = $ua->get( $protocol.$self->{address} );
 	$self->{content} = $response->content ;
 	my($timeElapsed) = tv_interval($timeStart, [gettimeofday()]);
@@ -220,10 +225,25 @@ sub detectCms{
 	}
 	$self->{cms} = $result;
 }
+sub computeIpFromAddress{
+	my ($self) = shift;
+
+	my $ip = gethostbyname($self->{address});
+	if (defined $ip) {
+		$self->{ip} = inet_ntoa($ip);
+	}
+}
+sub pingFromIP{
+	my ($self) = shift;
+	my $ping_cmd = `ping $self->{ip} -c 1`;
+	if( $ping_cmd =~ /mdev\s=\s(\d+\.\d+)\//){
+		$self->{ping} = $1;
+	}
+}
 sub checkSite{
 	my ($self) = shift;
 	my ($args) = shift;
-
+	DEBUG "Start check for : ".$self->{address};
 	DEBUG "Validate Url";
 	return 0 if !$self->validateUrl();
 	DEBUG "Download site";
@@ -237,8 +257,11 @@ sub checkSite{
 	DEBUG "Detect CMS";
 	$self->detectCms();
 	DEBUG "Compute Page Rank";
-	#$self->computeGooglePageRank();
-
+	$self->computeGooglePageRank();
+	DEBUG "Get ip address";
+	$self->computeIpFromAddress();
+	DEBUG "Server Ping time";
+	$self->pingFromIP();
 }
 #Concat 2 string, if the left string is not null we add a coma between them
 sub comaConcat {
@@ -264,14 +287,15 @@ sub save_operation{
 		id => $self->getId(), 
 		content => $self->getContent(), 
 		cms => $self->getCms(), 
-		ping => 0, 
+		ping => $self->{ping}, 
 		genTime => $self->getGenTime(), 
 		googleAnaStatus => $self->getGoogleAnaStatus(), 
 		pageRank => $self->getPageRank(),
 		matchKey => $self->getMatchKey(),
 		unMatchKey => $self->getUnMatchKey(),
 		gzip => $args->{gzip},
-		status => $self->getStatus() });
+		status => $self->getStatus(),
+		ip => $self->{ip} });
 }
 #Toggle the content to an operation id if it haven't changed since last checking
 sub toggleContentOrIdOperation{

@@ -30,7 +30,7 @@ sub new {
 		
 	$self->{_dsn}		=	"DBI:mysql:database=$target;host=localhost;port=3306;mysql_socket=/var/lib/mysql/mysql.sock";
 		
-	$self->{_db} 		=	DBI->connect($self->{_dsn}, "checking_dweb", "checking_dweb") or die "Cannot connect to Mysql";
+	$self->{_db} 		=	DBI->connect($self->{_dsn}, "checking_dweb", "P4kWbX0sE0QnOQwW66pnE8NTX8NWuL") or die "Cannot connect to Mysql";
 	
 	return $self
 }
@@ -112,8 +112,8 @@ sub insert_operation {
 	my ($args) = $_[0];
 
 	my $insert_operation = "INSERT INTO $TABLE_OPERATION 
-			   (id   , date  ,  content, unMatchKeywords, matchKeywords, googleAna ,cms , site_id, genTime, pageRank, status )
-		VALUES (NULL , NOW() ,  ?      ,  ?             , ?            , ?         , ?  , ?      , ?      , ?		, ?);";
+			   (id   , date  ,  content, unMatchKeywords, matchKeywords, googleAna ,cms , site_id, genTime, pageRank, status, ip, ping )
+		VALUES (NULL , NOW() ,  ?      ,  ?             , ?            , ?         , ?  , ?      , ?      , ?		, ?		, ?	, ?);";
 	my $db_keywords = $self->{_db}->prepare( $insert_operation );
 
 	if( $args->{gzip} ){
@@ -127,7 +127,8 @@ sub insert_operation {
 		INFO "gZip saved ".$gain." kBytes !";
 		$args->{content} = $content_compress;	
 	} 
-	$db_keywords->execute( $args->{content}, $args->{unMatchKey}, $args->{matchKey}, $args->{googleAnaStatus}, $args->{cms}, $args->{id}, $args->{genTime}, $args->{pageRank}, $args->{status});
+	$db_keywords->execute( $args->{content}, $args->{unMatchKey}, $args->{matchKey}, $args->{googleAnaStatus}, 
+		$args->{cms}, $args->{id}, $args->{genTime}, $args->{pageRank}, $args->{status}, $args->{ip}, $args->{ping});
 }
 #LOAD OPERATION FROM ID
 sub loadContentOperationId {

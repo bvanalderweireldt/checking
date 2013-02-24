@@ -6,8 +6,9 @@
 
 use strict;
 package Email;
-use Data::Dumper;
 use Site;
+use Log::Log4perl qw(:easy);
+Log::Log4perl->easy_init($DEBUG);
 
 #DEFAULT LANGAGE
 my $lang = "fr";
@@ -137,6 +138,13 @@ sub formatSitesCategorie{
 #Format anchor link for websites
 sub format_anchor{
 	return "<a href='".$_[0]."'>".$_[0]."</a>";
+}
+
+sub getCountSites{
+	my ($self) = shift;
+	return 0 if !defined $self->{refSites};
+	my $scalarRefSites = @{ $self->{refSites} };
+	return $scalarRefSites;
 }
 
 1;

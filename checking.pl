@@ -52,8 +52,8 @@ sub displayHelp{
 	db={db+username} default=checkingweb
 	gzip={0 or 1} gzip compression for screenshot default=1
 	siteid={idsite} check only one site
+	userid={userid} do a full scan for a given user
 	debug={0 or 1} activate debug output default =1\n";
-	
 }
 
 sub extractArg{
@@ -114,6 +114,11 @@ my @emails;
 DEBUG "Scanning to find what emails account have to be check !";
 while ( my @email = $emails_db->fetchrow_array() ) {
 	
+	if (! defined $email[0] or $email[0] eq ""){
+		ERROR "Empty email, go to the next one !";
+		next;
+	}
+
 	DEBUG "Analizing : ".$email[0];
 	
 	#if the site is activate but have no frequency we set it to 4 hours
@@ -167,10 +172,15 @@ my $mail_template_dir = "mail_template";
 my $mail_template = read_file( $mail_template_dir."/basic.html" );
 
 #SEND EMAILS
-DEBUG "Starting the email loop";
+DEBUG "Starting the email loop, must scan : ".scalar(@emails)." email(s)";
 foreach my $email_account ( @emails ){
 	DEBUG "Preparing mail content for : ".$email_account->getEmail();
-	
+
+	if( $email_account->getCountSites() == 0 ){
+		DEBUG "This account have no websites, go to the next !";
+		next;
+	}
+
 	my $title = Properties::getLang({ lang => $email_account->getLang(), key => "title" });
 	my $top_teaser = Properties::getLang({ lang => $email_account->getLang(), key => "top_teaser" });
 	my $help = Properties::getLang({ lang => $email_account->getLang(), key => "help" });
