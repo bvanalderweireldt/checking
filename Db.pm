@@ -38,7 +38,7 @@ sub new {
 sub loadEmails {
 	my $self = shift;
 	#SQL Query load every emails
-	my $load_all_emails_query = "select email, first_name, last_name, cc, frequency, user_id from $TABLE_USER as a right join $TABLE_USER_PROFILE as up on a.id = up.user_id";
+	my $load_all_emails_query = "select email, first_name, last_name, cc, frequency, user_id, force_email from $TABLE_USER as a right join $TABLE_USER_PROFILE as up on a.id = up.user_id";
 	my $db_emails = $self->{_db}->prepare( $load_all_emails_query );
 	$db_emails->execute() or die "Cannot load emails !";
 	return $db_emails;

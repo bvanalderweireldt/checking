@@ -75,6 +75,7 @@ sub newFromDbArray{
 	$self->{cms} = "";
 	$self->{unMatchKey} = "";
 	$self->{matchKey} = "";
+	$self->{ip} = 0;
 
 	return $self;
 }

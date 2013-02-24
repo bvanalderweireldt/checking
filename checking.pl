@@ -113,7 +113,6 @@ my @emails;
 #CHECK IF SOME emails account HAVE TO BE CHECK
 DEBUG "Scanning to find what emails account have to be check !";
 while ( my @email = $emails_db->fetchrow_array() ) {
-	
 	if (! defined $email[0] or $email[0] eq ""){
 		ERROR "Empty email, go to the next one !";
 		next;
@@ -127,15 +126,14 @@ while ( my @email = $emails_db->fetchrow_array() ) {
 	next unless ( $t % $email[4] == 0 );
 
 	DEBUG "#### Find one email account to check ".$email[0].", now will load websites associates.";
-
 	#we a new email and save it into the global array of email
 	my $emailToNotify = Email->new( { 
 		email => $email[0], 
 		nom => $email[1], 
 		prenom => $email[2], 
 		cc => $email[3], 
-		frequency => $email[4] });
-
+		frequency => $email[4],
+		force_email => $email[6] });
 	my $websites_db = $db->loadWebsitesEmailAccount( { user_id => $email[5] } );
 
 	while ( my @website = $websites_db->fetchrow_array() ){
@@ -178,6 +176,11 @@ foreach my $email_account ( @emails ){
 
 	if( $email_account->getCountSites() == 0 ){
 		DEBUG "This account have no websites, go to the next !";
+		next;
+	}
+
+	if( $email_account->hasOneError() == 0 && $email_account->getForceEmail() == 0 ){
+		DEBUG "No error detected, skip to the next one !";
 		next;
 	}
 

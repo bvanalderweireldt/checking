@@ -32,7 +32,8 @@ sub new {
 	$self->{frequency} = $args->{frequency};
 	$self->{refSites} = ();
 	$self->{lang} = $args->{lang};
-
+	$self->{force_email} = $args->{force_email};
+	
 	return $self
 }
 
@@ -61,6 +62,10 @@ sub getLang{
 	my $self = shift;
 	return $self->{lang};
 }
+sub getForceEmail{
+	my $self = shift;
+	return $self->{force_email};
+}
 #Return an array of id of websites corresponding to the status
 # 1) -> ref to the id hash
 # 2) -> status expected
@@ -76,6 +81,18 @@ sub getSiteByStatus{
 		}
 	}
 	return @refSitesByStatus;
+}
+sub hasOneError{
+	my ($self) = shift;
+
+	my @refSitesByStatus;
+	
+	foreach my $refSite ( @{ $self->{refSites} } ){
+		if( $refSite->Site::getStatus() != 20 ){
+			return 1;
+		}
+	}
+	return 0;	
 }
 #Return the content of this email
 sub getFormatContent{
