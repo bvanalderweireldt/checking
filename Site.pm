@@ -107,7 +107,7 @@ sub toString{
 #Check if the web site address is correct or not
 sub validateUrl{
 	my ($self) = shift;
-	if( $self->getAddress() !~ /^[^.]*(.)[a-zA-Z]+/i ){
+	if( $self->getAddress() !~ /([^.]*(.)[a-zA-Z]+)|((\d){0,3}\.{0,3}\.{0,3}\.{0,3}(\/~.*)?)/i ){
 		$self->{status} = 6 ;
 		return 0;
 	}
