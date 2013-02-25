@@ -14,9 +14,9 @@ use Time::HiRes qw(tv_interval gettimeofday);
 use WWW::Google::PageRank;
 use Mojo::DOM;
 use Socket;
-use Log::Log4perl qw(:easy);
-Log::Log4perl->easy_init($DEBUG);
 use Properties;
+use  Log::Log4perl;
+my $LOGGER = Log::Log4perl->get_logger("Site");
 
 my $protocol = "http://";
 
@@ -118,7 +118,7 @@ sub download{
 	my ($self) = shift;
 
 	my($timeStart) = [gettimeofday()];
-	DEBUG $protocol.$self->{address};
+	$LOGGER->debug($protocol.$self->{address});
 	my $response = $ua->get( $protocol.$self->{address} );
 	$self->{content} = $response->content ;
 	my($timeElapsed) = tv_interval($timeStart, [gettimeofday()]);
@@ -244,24 +244,24 @@ sub pingFromIP{
 sub checkSite{
 	my ($self) = shift;
 	my ($args) = shift;
-	DEBUG "Start check for : ".$self->{address};
-	DEBUG "Validate Url";
+	$LOGGER->debug("Start check for : ".$self->{address});
+	$LOGGER->debug("Validate Url");
 	return 0 if !$self->validateUrl();
-	DEBUG "Download site";
+	$LOGGER->debug("Download site");
 	return 0 if !$self->download();
-	DEBUG "Scan Global keywords";
+	$LOGGER->debug("Scan Global keywords");
 	$self->scanGLobalKeywords({keywords => $args->{keywords}});
-	DEBUG "Scan Expected keywords";
+	$LOGGER->debug("Scan Expected keywords");
 	$self->scanUnMatchKeywords();
-	DEBUG "Scan Google Analytic";
+	$LOGGER->debug("Scan Google Analytic");
 	$self->scanForGoogleAnalytic();
-	DEBUG "Detect CMS";
+	$LOGGER->debug("Detect CMS");
 	$self->detectCms();
-	DEBUG "Compute Page Rank";
+	$LOGGER->debug("Compute Page Rank");
 	$self->computeGooglePageRank();
-	DEBUG "Get ip address";
+	$LOGGER->debug("Get ip address");
 	$self->computeIpFromAddress();
-	DEBUG "Server Ping time";
+	$LOGGER->debug("Server Ping time");
 	$self->pingFromIP();
 }
 #Concat 2 string, if the left string is not null we add a coma between them
@@ -313,13 +313,13 @@ sub toggleContentOrIdOperation{
 	}
 	
 	if( $last_content ne $self->{content} ){
-		DEBUG "New content will be stored in DB !";
+		$LOGGER->debug("New content will be stored in DB !");
 	}
 	else{
 		if( $id_content eq "" ){
 			$id_content = $args->{db}->loadLastOperationIdFromSiteid(  { siteid => $self->{id} } );
 		}
-		DEBUG "Content haven't changed will make reference to the content already saved ! ($id_content)";
+		$LOGGER->debug("Content haven't changed will make reference to the content already saved ! ($id_content)");
 		$self->{content} = $id_content;
 	}
 }

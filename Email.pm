@@ -7,8 +7,8 @@
 use strict;
 package Email;
 use Site;
-use Log::Log4perl qw(:easy);
-Log::Log4perl->easy_init($DEBUG);
+use Log::Log4perl;
+my $LOGGER = Log::Log4perl->get_logger("Email");
 
 #DEFAULT LANGAGE
 my $lang = "fr";

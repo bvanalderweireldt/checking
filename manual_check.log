@@ -287,3 +287,15 @@ Cannot connect to Mysql at /home/checking/checking-beta/./Db.pm line 33.
 2013/02/23 11:31:28 Inserting operation for website : www.bv-blog.fr
 2013/02/23 11:31:28 Content haven't changed will make reference to the content already saved ! (1)
 2013/02/23 11:31:28 gZip saved -0.02 kBytes !
+Can't locate object method "DEBUG" via package "http://" (perhaps you forgot to load "http://"?) at /home/checking_beta/./Site.pm line 121.
+24/02 10:46:23 main:: /home/checking_beta/./checking.pl (76) Connecting to Database !
+24/02 10:46:23 Db::new /home/checking_beta/./Db.pm (26) ### Database Selected : checking_dweb
+Can't locate object method "DEBUG" via package "http://" (perhaps you forgot to load "http://"?) at /home/checking_beta/./Site.pm line 121.
+24/02 10:46:27 main:: /home/checking_beta/./checking.pl (76) Connecting to Database !
+24/02 10:46:27 Db::new /home/checking_beta/./Db.pm (26) ### Database Selected : checking_dweb
+24/02 10:54:12 main:: /home/checking_beta/./checking.pl (76) Connecting to Database !
+24/02 10:54:12 Db::new /home/checking_beta/./Db.pm (26) ### Database Selected : checking_dweb
+24/02 10:54:12 main:: /home/checking_beta/./checking.pl (100) Loading one Email id : 1
+$VAR1 = bless( {}, 'DBI::st' );
+$VAR1 = bless( {}, 'DBI::st' );
+$VAR1 = bless( {}, 'DBI::st' );
