@@ -1,8 +1,6 @@
 title=Webistes Checking
 top_teaser=Checking Websites Service.
-
 help=Pour informations : <ul><li>HTTP status should be equal to 200, 400 the link is malformed, 401 need an authentification, 403 acces forbiden, 404 page not found, 500 server error...(<a href="http://fr.wikipedia.org/wiki/Liste_des_codes_HTTP">More info</a>)</li><li>Webistes with suspicious keywords are websites that reponsd but some strange keywords have been detected (SQL, hacked, cracked....)</li><li>Websites with absent keywords are websites were some expected keywords cannot be find</li><li>Websites with a high generating time mean the website seem really long to load</li></ul> 
-
 http_error=Status http incorrect
 match_keywords=Mots clefs suspicieux
 unmatch_keywords=Mots clefs absents

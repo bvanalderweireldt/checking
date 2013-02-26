@@ -221,7 +221,6 @@ foreach my $email_account ( @emails ){
 	my $title = Properties::getLang({ lang => $email_account->getLang(), key => "title" });
 	my $top_teaser = Properties::getLang({ lang => $email_account->getLang(), key => "top_teaser" });
 	my $help = Properties::getLang({ lang => $email_account->getLang(), key => "help" });
-	print $mail_template;
 
 	$mail_template =~ s/{title}/$title/g;
 	$mail_template =~ s/{top_teaser}/$top_teaser/;
@@ -230,7 +229,6 @@ foreach my $email_account ( @emails ){
 	my $content = $email_account->getFormatContent();
 	
 	$mail_template =~ s/{content}/$content/;
-		print $mail_template;
 
 	my $cc = $email_account->getCc();
 	if($cc){		
