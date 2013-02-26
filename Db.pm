@@ -38,7 +38,7 @@ sub new {
 sub loadEmails {
 	my $self = shift;
 	#SQL Query load every emails
-	my $load_all_emails_query = "select email, first_name, last_name, cc, frequency, user_id, force_email from $TABLE_USER as a right join $TABLE_USER_PROFILE as up on a.id = up.user_id";
+	my $load_all_emails_query = "select email, first_name, last_name, cc, frequency, user_id, force_email, lang from $TABLE_USER as a right join $TABLE_USER_PROFILE as up on a.id = up.user_id";
 	my $db_emails = $self->{_db}->prepare( $load_all_emails_query );
 	$db_emails->execute() or die "Cannot load emails !";
 	return $db_emails->fetchall_arrayref();
@@ -48,7 +48,7 @@ sub loadEmailByUserId {
 	my ($self) = shift;
 	my ($args) = shift;
 	#SQL Query load every emails
-	my $load_all_emails_query = "select email, first_name, last_name, cc, frequency, user_id, force_email from $TABLE_USER as a right join $TABLE_USER_PROFILE as up on a.id = up.user_id where a.id = ?";
+	my $load_all_emails_query = "select email, first_name, last_name, cc, frequency, user_id, force_email, lang from $TABLE_USER as a right join $TABLE_USER_PROFILE as up on a.id = up.user_id where a.id = ?";
 	my $db_emails = $self->{_db}->prepare( $load_all_emails_query );
 	$db_emails->execute( $args->{userid} ) or die "Cannot load emails !";
 	return $db_emails->fetchall_arrayref();
@@ -60,10 +60,11 @@ sub loadWebsitesEmailAccount {
 	my ($args) = shift;
 	#SQL Query load all websites
 	my $load_websites_query = "select id, address, keywords, status 
-	from $TABLE_SITE  where monitor in (?) and user_id = ?";
+	from $TABLE_SITE  where monitor in (".$args->{monitor}.") and user_id = ?";
+
 	my $db_websites = $self->{_db}->prepare( $load_websites_query );
 		
-	$db_websites->execute( $args->{monitor}, $args->{user_id} ) or die "Cannot load websites !";
+	$db_websites->execute( $args->{user_id} ) or die "Cannot load websites !";
 	return $db_websites;
 }
 sub loadSiteFromId{

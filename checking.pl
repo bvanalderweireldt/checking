@@ -5,6 +5,13 @@
 
 use strict;
 use warnings;
+use Db;
+use Site;
+use Email;
+use Time::HiRes qw(tv_interval gettimeofday);
+use MIME::Lite;
+use File::Slurp;
+use Log::Log4perl;
 
 BEGIN{
 	use File::Basename;
@@ -12,7 +19,11 @@ BEGIN{
 	eval 'chdir "'.dirname(__FILE__).'"';
 }
 
-
+#
+#
+# Global Configuration
+#
+#
 my $conf_path = "conf/";
 my $db_target = "checking_dweb";
 my $gzip = 1;
@@ -44,17 +55,25 @@ foreach my $arg ( @ARGV ){
 		die("Error wrong argument passed, type -h to see help !");
 	}
 }
-#LOGGER
-use Log::Log4perl;
+sub extractArg{
+	my ($args) = shift;
+	$args->{arg} =~ s/^\w+=//;
+	return  $args->{arg};
+}
+
+#
+#
+# Init Logger
+#
+#
 Log::Log4perl->init($log);
 my $LOGGER = Log::Log4perl->get_logger("");
-use Db;
-use Site;
-use Email;
-use Time::HiRes qw(tv_interval gettimeofday);
-use MIME::Lite;
-use File::Slurp;
 
+#
+#
+# Display Help
+#
+#
 sub displayHelp{
 	print "Checking Help :
 	db={db+username} default=checkingweb
@@ -62,12 +81,6 @@ sub displayHelp{
 	siteid={idsite} check only one site
 	userid={userid} do a full scan for a given user
 	debug={0 or 1} activate debug output default =1\n";
-}
-
-sub extractArg{
-	my ($args) = shift;
-	$args->{arg} =~ s/^\w+=//;
-	return  $args->{arg};
 }
 
 $LOGGER->debug("Starting checking !");
@@ -80,7 +93,11 @@ my $db = Db->new({ db_target => $db_target });
 $LOGGER->debug("Loading global keywords !");
 my @keywords = $db->loadkeywords();
 
+#
+#
 #Do we just deal with one site ?
+#
+#
 if( $siteid != 0 ){
 	my @row = $db->loadSiteFromId( { siteid => $siteid } );
 	die("Empty Site ?") if !@row; 
@@ -95,6 +112,11 @@ if( $siteid != 0 ){
 	exit 0;
 }
 
+#
+#
+#Do we just deal with one user ?
+#
+#
 my $emails_db;
 if( $userid != 0){
 	$LOGGER->info("Loading one Email id : $userid");
@@ -104,6 +126,7 @@ else{
 	$LOGGER->info("Loading all Emails !");
 	$emails_db = $db->loadEmails();
 }
+
 #If their is no emails to check we stop here
 $LOGGER->info("No email to check !") and exit 0 unless scalar($emails_db) > 0;
 
@@ -143,11 +166,12 @@ while( my $email = ( shift(@$emails_db) ) ) {
 		prenom => @{$email}[2], 
 		cc => @{$email}[3], 
 		frequency => @{$email}[4],
-		force_email => @{$email}[6] });
+		force_email => @{$email}[6],
+		lang => @{$email}[7] });
 	my $monitor = ( $userid == 0 )?"1":"0,1";
 
 	my $websites_db = $db->loadWebsitesEmailAccount( { monitor => $monitor, user_id => @{$email}[5] } );
-	
+		
 	while ( my @website = $websites_db->fetchrow_array() ){
 		$LOGGER->debug("_Found one website link to ".@{$email}[0]." : ".$website[1]);
 
@@ -177,13 +201,11 @@ while ( ( my $key, $_ ) = each( %sites_tested ) ){
 }
 $LOGGER->debug("End of the main scanning loop !");
 
-#Loading the mail template
-my $mail_template_dir = "mail_template";
-my $mail_template = read_file( $mail_template_dir."/basic.html" );
 
 #SEND EMAILS
 $LOGGER->debug("Starting the email loop, must scan : ".scalar(@emails)." email(s)");
 foreach my $email_account ( @emails ){
+	my $mail_template = read_file( "mail_template/basic-".$email_account->getLang().".html" );
 	$LOGGER->debug("Preparing mail content for : ".$email_account->getEmail());
 
 	if( $email_account->getCountSites() == 0 ){
