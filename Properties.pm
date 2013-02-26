@@ -37,10 +37,10 @@ sub getLang{
 		return;		
 	}
 	
-	if( $args->{lang} eq "fr" ){
+	if( $args->{lang} =~ /fr/ ){
 		return $frLang->getProperty( $args->{key} );	
 	}
-	elsif( $args->{lang} eq "eng" ){
+	elsif( $args->{lang} =~ /eng/ ){
 		return $engLang->getProperty( $args->{key} );	
 	}
 }

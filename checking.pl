@@ -237,7 +237,7 @@ foreach my $email_account ( @emails ){
 	}
 	
 	my $msg = MIME::Lite->new(
-	             From     => '',
+	             From     => 'contact@web-mining.eu',
 	             To       => $email_account->getEmail(),
 	             Cc       => $cc,
 	             Subject  => "WebSite Checking",
