@@ -13,12 +13,6 @@ use MIME::Lite;
 use File::Slurp;
 use Log::Log4perl;
 
-BEGIN{
-	use File::Basename;
-	eval 'use lib "'.dirname(__FILE__).'"';
-	eval 'chdir "'.dirname(__FILE__).'"';
-}
-
 #
 #
 # Global Configuration
@@ -30,6 +24,13 @@ my $gzip = 1;
 my $siteid = 0;
 my $userid = 0;
 my $log = $conf_path."log4p-prod.conf";
+
+BEGIN{
+	use File::Basename;
+	eval 'use lib "'.dirname(__FILE__).'"';
+	eval 'chdir "'.dirname(__FILE__).'"';
+}
+
 
 foreach my $arg ( @ARGV ){
 	if( $arg =~ /db=\w+/i ){
