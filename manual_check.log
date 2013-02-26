@@ -299,3 +299,7 @@ Can't locate object method "DEBUG" via package "http://" (perhaps you forgot to 
 $VAR1 = bless( {}, 'DBI::st' );
 $VAR1 = bless( {}, 'DBI::st' );
 $VAR1 = bless( {}, 'DBI::st' );
+Can't open /var/log/checking.log (Permission non accordée) at /usr/local/share/perl5/Log/Log4perl/Appender/File.pm line 103.
+Can't open /var/log/checking.log (Permission non accordée) at /usr/local/share/perl5/Log/Log4perl/Appender/File.pm line 103.
+Can't open /var/log/checking.log (Permission non accordée) at /usr/local/share/perl5/Log/Log4perl/Appender/File.pm line 103.
+Can't open /var/log/checking.log (Permission non accordée) at /usr/local/share/perl5/Log/Log4perl/Appender/File.pm line 103.
