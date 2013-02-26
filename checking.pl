@@ -169,7 +169,7 @@ while( my $email = ( shift(@$emails_db) ) ) {
 		force_email => @{$email}[6],
 		lang => @{$email}[7] });
 	my $monitor = ( $userid == 0 )?"1":"0,1";
-
+		
 	my $websites_db = $db->loadWebsitesEmailAccount( { monitor => $monitor, user_id => @{$email}[5] } );
 		
 	while ( my @website = $websites_db->fetchrow_array() ){
@@ -217,7 +217,7 @@ foreach my $email_account ( @emails ){
 		$LOGGER->debug("No error detected and mail is not set to force, skip to the next one !");
 		next;
 	}
-
+	
 	my $title = Properties::getLang({ lang => $email_account->getLang(), key => "title" });
 	my $top_teaser = Properties::getLang({ lang => $email_account->getLang(), key => "top_teaser" });
 	my $help = Properties::getLang({ lang => $email_account->getLang(), key => "help" });
@@ -227,9 +227,8 @@ foreach my $email_account ( @emails ){
 	$mail_template =~ s/{help}/$help/;
 
 	my $content = $email_account->getFormatContent();
-
-	my $local_mail_template = $mail_template;
-	$local_mail_template =~ s/{content}/$content/;
+	
+	$mail_template =~ s/{content}/$content/;
 	
 	my $cc = $email_account->getCc();
 	if($cc){		
@@ -241,7 +240,7 @@ foreach my $email_account ( @emails ){
 	             To       => $email_account->getEmail(),
 	             Cc       => $cc,
 	             Subject  => "WebSite Checking",
-	             Data     => $local_mail_template,
+	             Data     => $mail_template,
 	             Type	  => "text/html; charset=iso-8859-1"
 	             );
 	

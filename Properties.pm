@@ -7,8 +7,8 @@ package Properties;
 use strict;
 use warnings;
 
-use Log::Log4perl qw(:easy);
-Log::Log4perl->easy_init($WARN);
+use Log::Log4perl;
+my $LOGGER = Log::Log4perl->get_logger("Props");
 
 use Config::Properties;
 
@@ -27,21 +27,26 @@ $frLang->load(*PROPS_FR);
 sub getLang{
 	
 	my ($args) = @_;
-	
+	$LOGGER->debug("Try to find properties messages, lang : ".$args->{lang}.", key : ".$args->{key});
 	if( !$args->{lang} ){
-		ERROR "getProp cannot get prop without lang !";
+		$LOGGER->error("getProp cannot get prop without lang !");
 		return;
 	}
 	if( !$args->{key} ){
-		ERROR "getProp cannot get prop without key !";
+		$LOGGER->error("getProp cannot get prop without key !");
 		return;		
 	}
 	
-	if( $args->{lang} =~ /fr/ ){
-		return $frLang->getProperty( $args->{key} );	
+	if( $args->{lang} =~ /fr/i ){
+		my $lang_key = $frLang->getProperty( $args->{key} );
+		$LOGGER->debug("Found : ".$lang_key);	
 	}
-	elsif( $args->{lang} =~ /eng/ ){
-		return $engLang->getProperty( $args->{key} );	
+	elsif( $args->{lang} =~ /eng/i ){
+		my $lang_key = $engLang->getProperty( $args->{key} );	
+		$LOGGER->debug("Found : ".$lang_key);	
+	}
+	else{
+		$LOGGER->error("Cannot find properties messages, lang : ".$args->{lang}.", key : ".$args->{key});
 	}
 }
 1
