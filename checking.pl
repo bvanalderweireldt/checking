@@ -3,6 +3,12 @@
 # Vanalderweireldt Benoit
 # 4/12/2012
 
+BEGIN{
+	use File::Basename;
+	eval 'use lib "'.dirname(__FILE__).'"';
+	eval 'chdir "'.dirname(__FILE__).'"';
+}
+
 use strict;
 use warnings;
 use Db;
@@ -24,13 +30,6 @@ my $gzip = 1;
 my $siteid = 0;
 my $userid = 0;
 my $log = $conf_path."log4p-prod.conf";
-
-BEGIN{
-	use File::Basename;
-	eval 'use lib "'.dirname(__FILE__).'"';
-	eval 'chdir "'.dirname(__FILE__).'"';
-}
-
 
 foreach my $arg ( @ARGV ){
 	if( $arg =~ /db=\w+/i ){
