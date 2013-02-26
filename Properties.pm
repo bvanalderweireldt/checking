@@ -39,11 +39,13 @@ sub getLang{
 	
 	if( $args->{lang} =~ /fr/i ){
 		my $lang_key = $frLang->getProperty( $args->{key} );
-		$LOGGER->debug("Found : ".$lang_key);	
+		$LOGGER->debug("Found : ".$lang_key);
+		return 	$lang_key;
 	}
 	elsif( $args->{lang} =~ /eng/i ){
 		my $lang_key = $engLang->getProperty( $args->{key} );	
-		$LOGGER->debug("Found : ".$lang_key);	
+		$LOGGER->debug("Found : ".$lang_key);
+		return $lang_key;	
 	}
 	else{
 		$LOGGER->error("Cannot find properties messages, lang : ".$args->{lang}.", key : ".$args->{key});
