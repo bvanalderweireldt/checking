@@ -3,7 +3,7 @@
 # Vanalderweireldt Benoit
 # 27/02/2013
 
-package Utils{
+package Utils;
 use Time::HiRes qw(tv_interval gettimeofday);
 #
 #
@@ -59,6 +59,5 @@ sub getFrequency{
 }
 sub getTimeSlot{
 	return $t;
-}
 }
 1
