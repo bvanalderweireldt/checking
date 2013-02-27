@@ -247,6 +247,7 @@ sub pingFromIP{
 sub checkSite{
 	my ($self) = shift;
 	my ($args) = shift;
+	
 	$LOGGER->debug("Start check for : ".$self->{address});
 	$LOGGER->debug("Validate Url");
 	return 0 if !$self->validateUrl();
@@ -266,6 +267,9 @@ sub checkSite{
 	$self->computeIpFromAddress();
 	$LOGGER->debug("Server Ping time");
 	$self->pingFromIP();
+		
+	$args->{email}->addSiteRef( $self );
+	return 1;
 }
 #Concat 2 string, if the left string is not null we add a coma between them
 sub comaConcat {
@@ -274,7 +278,6 @@ sub comaConcat {
 }
 #Check if it's an unauthrorized status
 sub is_unauthorized{
-	DEBUG $_[0];
 	if( $_[0] == 401 || $_[0] == 403 ){
 		return 1;
 	}

@@ -18,7 +18,7 @@ use Utils;
 use MIME::Lite;
 use File::Slurp;
 use Log::Log4perl;
-
+use threads;
 #
 #
 # Global Configuration
@@ -161,22 +161,47 @@ while( my @email = $emails_db->fetchrow_array) {
 	my $monitor = ( $userid == 0 )?"1":"0,1";
 		
 	my $websites_db = $db->loadWebsitesEmailAccount( { monitor => $monitor, user_id => $email[5] } );
-		
+	
+#
+#
+# Multi Thread part, we will launch one thread for every site, with a maximum of $nb_process threads	
+#
+#	
+	my $nb_process = 20;
+	my $nb_compute = $websites_db->rows;
+	my @running = ();
+	my @Threads;
+	my @sites;
+	my $i = 0;
+	my $total = $websites_db->rows;
 	while ( my @website = $websites_db->fetchrow_array() ){
-		$LOGGER->debug("_Found one website link to ".$email[0]." : ".$website[1]);
-		
 		my $site = Site->newFromDbArray( { site => \@website } );
 		$site->setStatus( 20 );
-
-		$site->checkSite( { keywords => \@keywords } );
-
-		$LOGGER->debug("Inserting operation for website : ".$site->getAddress());
-		$site->save_operation( { db => $db, gzip => $gzip } );
-
-		$emailToNotify->addSiteRef( $site );
+		push ( @sites, $site );
+		while( 1 ){
+			
+			@running = threads->list(threads::running);
+			if( scalar @running < $nb_process ){
+				$LOGGER->info("Thread ".$i." / ".$total);
+				$LOGGER->debug("Start new thread -> link to ".$email[0]." : ".$website[1]);
+				my $thread = threads->new( sub { $site->checkSite( { 	keywords => \@keywords, 
+																		db => $db, 
+																		email => $emailToNotify,
+																		gzip => $gzip } ) });
+				push (@Threads, $thread);
+				$i++;
+				last;
+			}
+			else{
+				$LOGGER->info("All thread are busy need to wait.");
+				sleep(1);
+			}
+		}
 		
 	}
-
+	foreach my $site_to_save ( @sites ){
+		$site_to_save->save_operation( { db => $db, gzip => $gzip } );
+	} 
 	push( @emails, $emailToNotify );
 }
 
