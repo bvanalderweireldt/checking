@@ -60,7 +60,7 @@ sub getCc{
 #Getter for lang
 sub getLang{
 	my $self = shift;
-	return $self->{lang};
+	return uc($self->{lang});
 }
 sub getForceEmail{
 	my $self = shift;
