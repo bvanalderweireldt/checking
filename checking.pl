@@ -167,7 +167,7 @@ while( my @email = $emails_db->fetchrow_array) {
 # Multi Thread part, we will launch one thread for every site, with a maximum of $nb_process threads	
 #
 #	
-	my $nb_process = 20;
+	my $nb_process = 10;
 	my $nb_compute = $websites_db->rows;
 	my @running = ();
 	my @Threads;
@@ -190,6 +190,10 @@ while( my @email = $emails_db->fetchrow_array) {
 																		gzip => $gzip } ) });
 				push (@Threads, $thread);
 				$i++;
+				if( scalar $i > $nb_process ){
+					my $site_to_save = shift( @sites );
+					$site_to_save->save_operation( { db => $db, gzip => $gzip } );
+				}
 				last;
 			}
 			else{

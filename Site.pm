@@ -22,7 +22,7 @@ my $protocol = "http://";
 
 my $ua = LWP::UserAgent->new();
 	$ua->agent('Mozilla/5.0 (Macintosh; Intel Mac OS X 10_7_5) AppleWebKit/536.26.14 (KHTML, like Gecko) Version/6.0.1 Safari/536.26.14');
-	$ua->timeout(50);
+	$ua->timeout(20);
 	$ua->max_redirect(10);
 	$ua->env_proxy;
 
@@ -303,6 +303,7 @@ sub save_operation{
 		gzip => $args->{gzip},
 		status => $self->getStatus(),
 		ip => $self->{ip} });
+	$self->{content} = undef;
 }
 #Toggle the content to an operation id if it haven't changed since last checking
 sub toggleContentOrIdOperation{
