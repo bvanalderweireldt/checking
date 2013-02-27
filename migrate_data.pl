@@ -22,10 +22,10 @@ $db_sites_s->execute() or die "Cannot load sites !";
 
 while ( my @site = $db_sites_s->fetchrow_array() ){
 	
-	my $test = $db_d->prepare( $test_exist_q." '%".$site[1]."'%");
-	my $test_result = $test->execute();
-	if( $test_result->fetchrow_array() ){
-		print "Doublon : ".$site[1];
+	my $test = $db_d->prepare( $test_exist_q." '%".$site[1]."%'");
+	$test->execute();
+	if( $test->fetchrow_array() ){
+		print "Doublon : ".$site[1]."\n";
 	}
 	else{		
 		my $insert_site = $db_d->prepare( $insert_site_q );
