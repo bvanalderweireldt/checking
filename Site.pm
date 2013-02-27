@@ -135,8 +135,10 @@ sub download{
 	#if the response code is an error, and is different than 401 and 403 ( unauthorized ) we stop here, the site is down
 	if( $response->is_error and ! is_unauthorized( $response->code ) ){
 		$self->{status} = 1;
+		undef $response;
 		return 0;
 	}
+	undef $response;
 	return 1;
 }
 
@@ -213,8 +215,9 @@ sub detectCms{
 		my $response = $ua->post('http://presta-version.bv-blog.fr/cgi-bin/version_presta.pl', { url => $self->{address} });
 
 		my $content = $response->content;
-
+	
 		$result = "prestashop ".$content;
+		undef $content;
 	}
 	elsif ( $result =~ /(.)*joomla(.)*/i ){
 		#Joomla
@@ -225,6 +228,7 @@ sub detectCms{
 		$result = "wordpress";
 	}
 	$self->{cms} = $result;
+	undef $dom, $result;
 }
 sub computeIpFromAddress{
 	my ($self) = shift;
@@ -233,6 +237,7 @@ sub computeIpFromAddress{
 	if (defined $ip) {
 		$self->{ip} = inet_ntoa($ip);
 	}
+	undef $ip;
 }
 sub pingFromIP{
 	my ($self) = shift;
@@ -243,6 +248,7 @@ sub pingFromIP{
 	else{
 		$self->{ping} = -1;
 	}
+	undef $ping_cmd;
 }
 sub checkSite{
 	my ($self) = shift;
@@ -303,7 +309,8 @@ sub save_operation{
 		gzip => $args->{gzip},
 		status => $self->getStatus(),
 		ip => $self->{ip} });
-	$self->{content} = undef;
+		
+	undef $self->{content};
 }
 #Toggle the content to an operation id if it haven't changed since last checking
 sub toggleContentOrIdOperation{
@@ -329,6 +336,7 @@ sub toggleContentOrIdOperation{
 		$LOGGER->debug("Content haven't changed will make reference to the content already saved ! ($id_content)");
 		$self->{content} = $id_content;
 	}
+	undef $last_content, $id_content;
 }
 #Setter for the status
 sub setStatus{

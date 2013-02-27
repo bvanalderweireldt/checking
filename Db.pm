@@ -139,6 +139,7 @@ sub insert_operation {
 		my $gain = (length($args->{content}) - length($content_compress)) / 1000;
 		$LOGGER->info("gZip saved ".$gain." kBytes !");
 		$args->{content} = $content_compress;	
+		undef $content_compress;
 	} 
 	$db_keywords->execute( $args->{content}, $args->{unMatchKey}, $args->{matchKey}, $args->{googleAnaStatus}, 
 		$args->{cms}, $args->{id}, $args->{genTime}, $args->{pageRank}, $args->{status}, $args->{ip}, $args->{ping});
