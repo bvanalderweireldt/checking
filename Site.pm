@@ -236,9 +236,12 @@ sub computeIpFromAddress{
 }
 sub pingFromIP{
 	my ($self) = shift;
-	my $ping_cmd = `ping $self->{ip} -c 1`;
+	my $ping_cmd = `ping $self->{ip} -c 1 -w 10`;
 	if( $ping_cmd =~ /mdev\s=\s(\d+\.\d+)\//){
 		$self->{ping} = $1;
+	}
+	else{
+		$self->{ping} = -1;
 	}
 }
 sub checkSite{
