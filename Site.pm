@@ -150,7 +150,7 @@ sub scanGLobalKeywords{
 	my ($args) = shift;
 
 	foreach my $global_keyword ( @{$args->{keywords}} ){
-		if ( $self->{content} =~ /.*$global_keyword.*/i ){
+		if ( $self->{content} =~ /$global_keyword/i ){
 			$self->{matchKey} = comaConcat( $self->{matchKey}, $global_keyword );
 			$self->{status} = 2;
 		}
@@ -164,7 +164,7 @@ sub scanUnMatchKeywords{
 		my @keywords_specific = split ( ";", $self->{keywords} );
 		foreach my $keyword ( @keywords_specific ){
 			#if it doesn't contain the given keyword
-			if ( $self->{content} !~ /$keyword/ ){
+			if ( $self->{content} !~ /$keyword/i ){
 			print $keyword."\n"; 
 				$self->{unMatchKey} = comaConcat( $self->{unMatchKey}, $keyword );
 				$self->{status} = 3;
