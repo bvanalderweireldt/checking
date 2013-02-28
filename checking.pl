@@ -161,6 +161,7 @@ while( my @email = $emails_db->fetchrow_array) {
 		frequency => $email[4],
 		force_email => $email[6],
 		lang => $email[7] });
+	push( @emails, $emailToNotify );
 	undef @email;
 	my $monitor = ( $userid == 0 )?"1":"0,1";
 		

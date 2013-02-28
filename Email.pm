@@ -81,7 +81,7 @@ sub getSiteByStatus{
 	my @refSitesByStatus;
 	
 	foreach my $refSite ( @{ $self->{refSites} } ){
-		if( $refSite->Site::getStatus() == $args->{status} ){
+		if( ${$refSite}->Site::getStatus() == $args->{status} ){
 			push( @refSitesByStatus, $refSite );
 		}
 	}
@@ -93,7 +93,7 @@ sub hasOneError{
 	my @refSitesByStatus;
 	
 	foreach my $refSite ( @{ $self->{refSites} } ){
-		if( $refSite->Site::getStatus() != 20 ){
+		if( ${$refSite}->Site::getStatus() != 20 ){
 			return 1;
 		}
 	}
@@ -151,7 +151,7 @@ sub formatSitesCategorie{
 	my $cat_top = "<tr><td valign=\"top\"><div mc:edit=\"std_content00\"><h4 class=\"h4\">$args->{title}</h4><ul>";
 	
 	foreach my $site ( @refSitesByStatus ){
-		$cat_top .= "<li>".format_anchor($site->getAddress())." ".$site->toString({ lang => $self->{lang} })."</li>";
+		$cat_top .= "<li>".format_anchor(${$site}->getAddress())." ".${$site}->toString({ lang => $self->{lang} })."</li>";
 	}
 	
     return $cat_top."</ul></div></td></tr>";
