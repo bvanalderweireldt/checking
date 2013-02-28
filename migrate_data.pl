@@ -20,6 +20,8 @@ my $load_all_sites = "select * from monitorServer_site";
 my $db_sites_s = $db_s->prepare( $load_all_sites );
 $db_sites_s->execute() or die "Cannot load sites !";
 
+my $limit=0;
+
 while ( my @site = $db_sites_s->fetchrow_array() ){
 	
 	my $test = $db_d->prepare( $test_exist_q." '%".$site[1]."%'");
@@ -32,4 +34,10 @@ while ( my @site = $db_sites_s->fetchrow_array() ){
 		$site[4] = ( ! defined $site[4] ) ? '':$site[4];
 		$insert_site->execute( $site[1], $site[5], $site[4] );
 	}
+	
+	if ( $limit > $ARGV[2] ){
+		last;
+	}
+	$limit++;
 }
+print $limit."\n";
