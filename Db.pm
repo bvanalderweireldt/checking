@@ -73,7 +73,7 @@ sub loadSiteFromId{
 	#Query to load one site
 	my $loadSiteFromId = "select id, address, keywords, status from $TABLE_SITE where id = ?"; 
 	my $db_site = $self->{_db}->prepare( $loadSiteFromId );
-	$db_site->execute( $args->{siteid} ) or die "Cannot load site !";
+	$db_site->execute( ${$args->{siteid}} ) or die "Cannot load site !";
 	return $db_site->fetchrow_array();	
 }
 sub updateSiteSatus{
@@ -122,8 +122,8 @@ sub loadLastOperationIdFromSiteid {
 #INSERT ONE OPERATION IN DB
 sub insert_operation {
 	my $self = shift;
-	my ($args) = $_[0];
-
+	my ($args) = shift;
+	
 	my $insert_operation = "INSERT INTO $TABLE_OPERATION 
 			   (id   , date  ,  content, unMatchKeywords, matchKeywords, googleAna ,cms , site_id, genTime, pageRank, status, ip, ping )
 		VALUES (NULL , NOW() ,  ?      ,  ?             , ?            , ?         , ?  , ?      , ?      , ?		, ?		, ?	, ?);";

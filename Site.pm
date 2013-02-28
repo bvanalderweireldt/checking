@@ -17,14 +17,9 @@ use Socket;
 use Properties;
 use  Log::Log4perl;
 my $LOGGER = Log::Log4perl->get_logger("Site");
+use threads;
 
 my $protocol = "http://";
-
-my $ua = LWP::UserAgent->new();
-	$ua->agent('Mozilla/5.0 (Macintosh; Intel Mac OS X 10_7_5) AppleWebKit/536.26.14 (KHTML, like Gecko) Version/6.0.1 Safari/536.26.14');
-	$ua->timeout(20);
-	$ua->max_redirect(10);
-	$ua->env_proxy;
 
 #Generating time limit ( ms )
 my $generatingTimeLimit = 15000;
@@ -38,7 +33,7 @@ sub new {
 	bless $self, $class;
 		
 	$self->{id}	= $args->{id};
-
+	
 	$self->{address} = $args->{address};
 	$self->{address} =~ s/^http(s)?://i;
 	$self->{address} =~ s/\/$//;
@@ -116,7 +111,13 @@ sub validateUrl{
 #Download the content of the website and save the generating time of the page
 sub download{
 	my ($self) = shift;
-
+	
+	my $ua = LWP::UserAgent->new();
+		$ua->agent('Mozilla/5.0 (Macintosh; Intel Mac OS X 10_7_5) AppleWebKit/536.26.14 (KHTML, like Gecko) Version/6.0.1 Safari/536.26.14');
+		$ua->timeout(20);
+		$ua->max_redirect(10);
+		$ua->env_proxy;
+	
 	my($timeStart) = [gettimeofday()];
 	$LOGGER->debug($protocol.$self->{address});
 	my $response = $ua->get( $protocol.$self->{address} );
@@ -138,7 +139,7 @@ sub download{
 		undef $response;
 		return 0;
 	}
-	undef $response;
+	undef $response, $ua;
 	return 1;
 }
 
@@ -184,6 +185,7 @@ sub computeGooglePageRank{
 	my ($self) = shift;
 	my $pr = WWW::Google::PageRank->new;
 	$self->{pageRank} = scalar($pr->get($protocol.$self->{address}, "\n" ));
+	undef $pr;
 }
 #Try to guess if the site is running a CMS
 sub detectCms{
@@ -253,7 +255,7 @@ sub pingFromIP{
 sub checkSite{
 	my ($self) = shift;
 	my ($args) = shift;
-	
+	$self->{status} = 20;
 	$LOGGER->debug("Start check for : ".$self->{address});
 	$LOGGER->debug("Validate Url");
 	return 0 if !$self->validateUrl();
@@ -274,8 +276,7 @@ sub checkSite{
 	$LOGGER->debug("Server Ping time");
 	$self->pingFromIP();
 		
-	$args->{email}->addSiteRef( $self );
-	return 1;
+	return $self;
 }
 #Concat 2 string, if the left string is not null we add a coma between them
 sub comaConcat {
@@ -293,11 +294,11 @@ sub is_unauthorized{
 sub save_operation{
 	my ($self) = shift;
 	my ($args) = shift;
-	
+		
 	$self->toggleContentOrIdOperation( { db => $args->{db} } );
 
-	$args->{db}->insert_operation( { 
-		id => $self->getId(), 
+	${$args->{db}}->insert_operation( { 
+		id => $self->{id}, 
 		content => $self->getContent(), 
 		cms => $self->getCms(), 
 		ping => $self->{ping}, 
@@ -316,14 +317,16 @@ sub save_operation{
 sub toggleContentOrIdOperation{
 	my ($self) = shift;
 	my ($args) = shift;
-	
-	my $last_content = $args->{db}->loadLastContentFromSiteid( { siteid => $self->{id} } );
+
 	my $id_content = "";
+	my $last_content;
+	
+	my $last_content = ${$args->{db}}->loadLastContentFromSiteid( { siteid => $self->{id} } );
 	
 	#If the content refer to a id
 	if( $last_content =~ /^\d+$/ ){
 		$id_content = $last_content;
-		$last_content = $args->{db}->loadContentOperationId( { id => $id_content } );
+		$last_content = ${$args->{db}}->loadContentOperationId( { id => $id_content } );
 	}
 	
 	if( $last_content ne $self->{content} ){
@@ -331,7 +334,7 @@ sub toggleContentOrIdOperation{
 	}
 	else{
 		if( $id_content eq "" ){
-			$id_content = $args->{db}->loadLastOperationIdFromSiteid(  { siteid => $self->{id} } );
+			$id_content = ${$args->{db}}->loadLastOperationIdFromSiteid(  { siteid => $self->{id} } );
 		}
 		$LOGGER->debug("Content haven't changed will make reference to the content already saved ! ($id_content)");
 		$self->{content} = $id_content;

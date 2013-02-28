@@ -21,6 +21,7 @@ use MIME::Lite;
 use File::Slurp;
 use Log::Log4perl;
 use threads;
+use Try::Tiny;
 #
 #
 # Global Configuration
@@ -89,15 +90,16 @@ my @keywords = $db->loadkeywords();
 #
 #
 if( $siteid != 0 ){
-	my @row = $db->loadSiteFromId( { siteid => $siteid } );
+	my @row = $db->loadSiteFromId( { siteid => \$siteid } );
 	die("Empty Site ?") if !@row; 
 	my $site_to_check = Site->newFromDbArray( { site => \@row } );
 	$site_to_check->setStatus( 20 );
 
-	$site_to_check->checkSite( { keywords => \@keywords } );
+	$site_to_check->checkSite( { 	keywords => \@keywords, 
+									email => undef  } );
 
 	$LOGGER->debug("Inserting operation for website : ".$site_to_check->getAddress());
-	$site_to_check->save_operation( { db => $db, gzip => $gzip } );
+	$site_to_check->save_operation( { db => \$db, gzip => $gzip } );
 	$db->updateSiteSatus( { status =>  $site_to_check->getStatus(), id => $site_to_check->getId() } );
 	exit 0;
 }
@@ -153,6 +155,7 @@ while( my @email = $emails_db->fetchrow_array) {
 	$LOGGER->debug("#### Find one email account to check ".$email[0].", now will load websites associates.");
 	#we a new email and save it into the global array of email
 	my $emailToNotify = Email->new( { 
+		id => $email[5],
 		email => $email[0], 
 		nom => $email[1], 
 		prenom => $email[2], 
@@ -160,42 +163,56 @@ while( my @email = $emails_db->fetchrow_array) {
 		frequency => $email[4],
 		force_email => $email[6],
 		lang => $email[7] });
+	undef @email;
 	my $monitor = ( $userid == 0 )?"1":"0,1";
 		
-	my $websites_db = $db->loadWebsitesEmailAccount( { monitor => $monitor, user_id => $email[5] } );
+	my $websites_db = $db->loadWebsitesEmailAccount( { monitor => $monitor, user_id => $emailToNotify->getId() } );
 	
 #
 #
 # Multi Thread part, we will launch one thread for every site, with a maximum of $nb_process threads	
 #
 #	
-	my $nb_process = 10;
-	my $nb_compute = $websites_db->rows;
-	my @running = ();
-	my @Threads;
+	my $nb_process = 15; #Number of simultaneous process that can run
+	my $nb_compute = $websites_db->rows; # Number of sites(process) we will need to run
 	my @sites;
+	my @running = ();
 	my $i = 0;
 	my $total = $websites_db->rows;
+	
 	while ( my @website = $websites_db->fetchrow_array() ){
 		my $site = Site->newFromDbArray( { site => \@website } );
-		$site->setStatus( 20 );
-		push ( @sites, $site );
+		undef @website;#We unrefence the ressource from array;
+		
+		#While we cannot launch a new thread we wait
 		while( 1 ){
-			
 			@running = threads->list(threads::running);
 			if( scalar @running < $nb_process ){
-				$LOGGER->info("Thread ".$i." / ".$total);
-				$LOGGER->debug("Start new thread -> link to ".$email[0]." : ".$website[1]);
-				my $thread = threads->new( sub { $site->checkSite( { 	keywords => \@keywords, 
-																		db => $db, 
-																		email => $emailToNotify,
-																		gzip => $gzip } ) });
-				push (@Threads, $thread);
+				$LOGGER->debug("Thread ".$i." / ".$total." , new thread -> link to ".$emailToNotify->getEmail()." : ".$site->getAddress());
+				my $thread = threads->new( sub { \$site->checkSite( { keywords => \@keywords } ) });
 				$i++;
-				if( scalar $i > $nb_process ){
-					my $site_to_save = shift( @sites );
-					$site_to_save->save_operation( { db => $db, gzip => $gzip } );
+				my $finish_thread_id = -1;
+				foreach my $t ( @running ){
+					$finish_thread_id = $t->tid();
+					if( $t->is_joinable() ){
+						my $site_to_save = $t->join();
+						if( defined $site_to_save ){
+							try{
+								${$site_to_save}->Site::save_operation( { db => \$db, gzip => \$gzip } );
+								$db->updateSiteSatus( { status =>  ${$site_to_save}->getStatus(), id => ${$site_to_save}->getId() } );
+								$emailToNotify->addSiteRef( $site_to_save );
+							}
+							catch{
+								$LOGGER->error("Cannot save a site operation !!!");
+							};							
+						}
+						else{
+							$LOGGER->error("The ref returned by the thread is empty !!!");
+						}
+						undef $site_to_save;
+					}
 				}
+				
 				last;
 			}
 			else{
@@ -205,12 +222,25 @@ while( my @email = $emails_db->fetchrow_array) {
 		}
 		
 	}
-	foreach my $site_to_save ( @sites ){
-		$site_to_save->save_operation( { db => $db, gzip => $gzip } );
-	} 
-	push( @emails, $emailToNotify );
+	#
+	#
+	# We close the unfinished thread
+	#
+	#
+	foreach my $thread ( threads->list(threads::running) ){
+		if( defined $thread ){
+			try{
+				my $site_to_save = $thread->join();
+				${$site_to_save}->save_operation( { db => \$db, gzip => \$gzip } );
+				$db->updateSiteSatus( { status =>  $site_to_save->getStatus(), id => $site_to_save->getId() } );
+				$emailToNotify->addSiteRef( \$site_to_save );
+			}
+			catch{
+				$LOGGER->error("Cannot save a site operation !!!");
+			}
+		}
+	}
 }
-
 #
 #
 #Send emails

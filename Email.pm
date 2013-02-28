@@ -25,6 +25,7 @@ sub new {
 		$args->{lang} = $lang;
 	}		
 	
+	$self->{id} = $args->{id};
 	$self->{email} = $args->{email};
 	$self->{nom} =	$args->{nom};
 	$self->{prenom}	= $args->{prenom};
@@ -65,6 +66,10 @@ sub getLang{
 sub getForceEmail{
 	my $self = shift;
 	return $self->{force_email};
+}
+sub getId{
+	my $self = shift;
+	return $self->{id};
 }
 #Return an array of id of websites corresponding to the status
 # 1) -> ref to the id hash
