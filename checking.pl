@@ -226,16 +226,21 @@ while( my @email = $emails_db->fetchrow_array) {
 	# We close the unfinished thread
 	#
 	#
-	foreach my $thread ( threads->list(threads::running) ){
+	foreach my $thread ( threads->list() ){
 		if( defined $thread ){
 			try{
 				my $site_to_save = $thread->join();
-				${$site_to_save}->save_operation( { db => \$db, gzip => \$gzip } );
-				$db->updateSiteSatus( { status =>  ${$site_to_save}->getStatus(), id => ${$site_to_save}->getId() } );
-				$emailToNotify->addSiteRef( $site_to_save );
+				try{
+					${$site_to_save}->save_operation( { db => \$db, gzip => \$gzip } );
+					$db->updateSiteSatus( { status =>  ${$site_to_save}->getStatus(), id => ${$site_to_save}->getId() } );
+					$emailToNotify->addSiteRef( $site_to_save );
+				}
+				catch{
+					$LOGGER->error("Cannot save a site operation !!!");
+				}
 			}
 			catch{
-				$LOGGER->error("Cannot save a site operation !!!");
+				$LOGGER->debug("This thread is closed already !!!");
 			}
 		}
 	}
