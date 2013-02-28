@@ -172,7 +172,7 @@ while( my @email = $emails_db->fetchrow_array) {
 # Multi Thread part, we will launch one thread for every site, with a maximum of $nb_process threads	
 #
 #	
-	my $nb_process = 15; #Number of simultaneous process that can run
+	my $nb_process = 5; #Number of simultaneous process that can run
 	my $nb_compute = $websites_db->rows; # Number of sites(process) we will need to run
 	my @sites;
 	my @running = ();
@@ -254,7 +254,7 @@ while( my @email = $emails_db->fetchrow_array) {
 					}
 				}
 				catch{
-					$LOGGER->error("Cannot save a site operation !!!");
+					$LOGGER->error("Cannot save a site operation !!!".$_);
 				}
 			}
 			catch{
