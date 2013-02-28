@@ -207,7 +207,7 @@ while( my @email = $emails_db->fetchrow_array) {
 			foreach my $thread ( @joinable ){
 				if( $thread->is_joinable() ){
 					my $site_to_save = $thread->join();
-					$LOGGER->info("Found one thread to finish : ".$thread->tid());
+					$LOGGER->debug("Found one thread to finish : ".$thread->tid());
 					if( defined $site_to_save ){
 						try{
 							${$site_to_save}->Site::save_operation( { db => \$db, gzip => \$gzip } );
