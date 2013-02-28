@@ -176,6 +176,7 @@ while( my @email = $emails_db->fetchrow_array) {
 	my $nb_compute = $websites_db->rows; # Number of sites(process) we will need to run
 	my @sites;
 	my @running = ();
+	my @joinable = ();
 	my $i = 0;
 	my $total = $websites_db->rows;
 	
@@ -185,38 +186,44 @@ while( my @email = $emails_db->fetchrow_array) {
 		
 		#While we cannot launch a new thread we wait
 		while( 1 ){
+			
 			@running = threads->list(threads::running);
 			if( scalar @running < $nb_process ){
 				$LOGGER->debug("Thread ".$i." / ".$total." , new thread -> link to ".$emailToNotify->getEmail()." : ".$site->getAddress());
-				my $thread = threads->new( sub { \$site->checkSite( { keywords => \@keywords } ) });
+				my $thread = threads->new({'context' => 'list'}, sub { \$site->checkSite( { keywords => \@keywords } ) });
 				$i++;
-				my $finish_thread_id = -1;
-				foreach my $t ( @running ){
-					$finish_thread_id = $t->tid();
-					if( $t->is_joinable() ){
-						my $site_to_save = $t->join();
-						if( defined $site_to_save ){
-							try{
-								${$site_to_save}->Site::save_operation( { db => \$db, gzip => \$gzip } );
-								$db->updateSiteSatus( { status =>  ${$site_to_save}->getStatus(), id => ${$site_to_save}->getId() } );
-								$emailToNotify->addSiteRef( $site_to_save );
-							}
-							catch{
-								$LOGGER->error("Cannot save a site operation !!!");
-							};							
-						}
-						else{
-							$LOGGER->error("The ref returned by the thread is empty !!!");
-						}
-						undef $site_to_save;
-					}
-				}
-				
 				last;
 			}
 			else{
-				$LOGGER->info("All thread are busy need to wait.");
+				$LOGGER->debug("All thread are busy need to wait.");
 				sleep(1);
+			}
+			
+			@joinable = threads->list(threads::joinable);
+			foreach my $thread ( @joinable ){
+				if( $thread->is_joinable() ){
+					my $site_to_save = $thread->join();
+					$LOGGER->debug("Found one thread to finish");
+					if( defined $site_to_save ){
+						try{
+							${$site_to_save}->Site::save_operation( { db => \$db, gzip => \$gzip } );
+							$db->updateSiteSatus( { status =>  ${$site_to_save}->getStatus(), id => ${$site_to_save}->getId() } );
+							$emailToNotify->addSiteRef( $site_to_save );
+							try{
+								$thread->kill('KILL')->detach;
+							}
+							catch{
+							}
+						}
+						catch{
+							$LOGGER->debug("Cannot save a site operation !!!".$_);
+						};
+					}
+					else{
+						$LOGGER->error("The ref returned by the thread is empty !!!");
+					}
+					undef $site_to_save;
+				}
 			}
 		}
 		
@@ -234,6 +241,11 @@ while( my @email = $emails_db->fetchrow_array) {
 					${$site_to_save}->save_operation( { db => \$db, gzip => \$gzip } );
 					$db->updateSiteSatus( { status =>  ${$site_to_save}->getStatus(), id => ${$site_to_save}->getId() } );
 					$emailToNotify->addSiteRef( $site_to_save );
+					try{
+						$thread->kill('KILL')->detach;
+					}
+					catch{
+					}
 				}
 				catch{
 					$LOGGER->error("Cannot save a site operation !!!");

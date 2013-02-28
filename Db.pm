@@ -137,7 +137,7 @@ sub insert_operation {
 		
 		use bytes;
 		my $gain = (length($args->{content}) - length($content_compress)) / 1000;
-		$LOGGER->info("gZip saved ".$gain." kBytes !");
+		$LOGGER->debug("gZip saved ".$gain." kBytes !");
 		$args->{content} = $content_compress;	
 		undef $content_compress;
 	} 
