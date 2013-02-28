@@ -133,13 +133,14 @@ sub download{
 	#we get the http response code from the user agent
 	$self->{httpResp} = $response->code; 	
 
+	undef $ua, $timeStart, $timeElapsed;
 	#if the response code is an error, and is different than 401 and 403 ( unauthorized ) we stop here, the site is down
 	if( $response->is_error and ! is_unauthorized( $response->code ) ){
 		$self->{status} = 1;
 		undef $response;
 		return 0;
 	}
-	undef $response, $ua;
+	undef $response;
 	return 1;
 }
 
@@ -169,6 +170,7 @@ sub scanUnMatchKeywords{
 			}
 		}
 	}
+	undef @keywords_specific;
 }
 #Scan for Google Analytic Presence
 sub scanForGoogleAnalytic{

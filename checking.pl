@@ -51,7 +51,7 @@ foreach my $arg ( @ARGV ){
 	elsif( $arg =~ /userid=\d+/i){
 		$userid = Utils::extractArgFromString({ arg => $arg })
 	}
-	elsif( $arg =~ /debug=(0|1)/i ){
+	elsif( $arg =~ /debug/i ){
 		$log = $conf_path."log4p-debug.conf";
 	}
 	elsif( $arg =~ /-h/i ){
@@ -186,33 +186,38 @@ while( my @email = $emails_db->fetchrow_array) {
 		
 		#While we cannot launch a new thread we wait
 		while( 1 ){
-			
 			@running = threads->list(threads::running);
 			if( scalar @running < $nb_process ){
 				$LOGGER->debug("Thread ".$i." / ".$total." , new thread -> link to ".$emailToNotify->getEmail()." : ".$site->getAddress());
 				my $thread = threads->new({'context' => 'list'}, sub { \$site->checkSite( { keywords => \@keywords } ) });
 				$i++;
-				last;
+				last; #We just create a new thread, so we leave the while, to get a new website bd array
 			}
 			else{
 				$LOGGER->debug("All thread are busy need to wait.");
 				sleep(1);
 			}
 			
+			#
+			#
+			# We try to close thread that can be close, to avoid high memory peak
+			#
+			#
 			@joinable = threads->list(threads::joinable);
 			foreach my $thread ( @joinable ){
 				if( $thread->is_joinable() ){
 					my $site_to_save = $thread->join();
-					$LOGGER->debug("Found one thread to finish");
+					$LOGGER->debug("Found one thread to finish : ".$thread->tid());
 					if( defined $site_to_save ){
 						try{
 							${$site_to_save}->Site::save_operation( { db => \$db, gzip => \$gzip } );
 							$db->updateSiteSatus( { status =>  ${$site_to_save}->getStatus(), id => ${$site_to_save}->getId() } );
 							$emailToNotify->addSiteRef( $site_to_save );
 							try{
-								$thread->kill('KILL')->detach;
+								$thread->kill('KILL')->detach; 
 							}
 							catch{
+								#We join the thread already, but just to be sure
 							}
 						}
 						catch{
@@ -245,6 +250,7 @@ while( my @email = $emails_db->fetchrow_array) {
 						$thread->kill('KILL')->detach;
 					}
 					catch{
+						#We join the thread already, but just to be sure
 					}
 				}
 				catch{
