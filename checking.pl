@@ -7,8 +7,6 @@ BEGIN{
 	use File::Basename;
 	eval 'use lib "'.dirname(__FILE__).'"';
 	eval 'chdir "'.dirname(__FILE__).'"';
-	use BSD::Resource;
-	setrlimit(get_rlimits()->{RLIMIT_VMEM}, 10_500_000_000, -1) or die;
 }
 
 use strict;
