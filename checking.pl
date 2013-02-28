@@ -230,8 +230,8 @@ while( my @email = $emails_db->fetchrow_array) {
 			try{
 				my $site_to_save = $thread->join();
 				${$site_to_save}->save_operation( { db => \$db, gzip => \$gzip } );
-				$db->updateSiteSatus( { status =>  $site_to_save->getStatus(), id => $site_to_save->getId() } );
-				$emailToNotify->addSiteRef( \$site_to_save );
+				$db->updateSiteSatus( { status =>  ${$site_to_save}->getStatus(), id => ${$site_to_save}->getId() } );
+				$emailToNotify->addSiteRef( $site_to_save );
 			}
 			catch{
 				$LOGGER->error("Cannot save a site operation !!!");
