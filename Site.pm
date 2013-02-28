@@ -164,7 +164,8 @@ sub scanUnMatchKeywords{
 		my @keywords_specific = split ( ";", $self->{keywords} );
 		foreach my $keyword ( @keywords_specific ){
 			#if it doesn't contain the given keyword
-			if ( $self->{content} !~ /.*$keyword.*/ ){
+			if ( $self->{content} !~ /$keyword/ ){
+			print $keyword."\n"; 
 				$self->{unMatchKey} = comaConcat( $self->{unMatchKey}, $keyword );
 				$self->{status} = 3;
 			}
