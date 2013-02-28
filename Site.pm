@@ -121,7 +121,7 @@ sub download{
 	my($timeStart) = [gettimeofday()];
 	$LOGGER->debug($protocol.$self->{address});
 	my $response = $ua->get( $protocol.$self->{address} );
-	$self->{content} = $response->as_string;
+	$self->{content} = $response->content;
 	print $self->{content}."\n";
 	my($timeElapsed) = tv_interval($timeStart, [gettimeofday()]);
 	$self->{genTime} = ( $timeElapsed * 1000 );
