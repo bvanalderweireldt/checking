@@ -170,7 +170,6 @@ sub scanUnMatchKeywords{
 			}
 		}
 	}
-	undef @keywords_specific;
 }
 #Scan for Google Analytic Presence
 sub scanForGoogleAnalytic{
