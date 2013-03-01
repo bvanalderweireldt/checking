@@ -7,7 +7,7 @@
 use DBI;
 use strict;
 package Db;
-
+use utf8;
 use Log::Log4perl;
 my $LOGGER = Log::Log4perl->get_logger("Db");
 #TABLE DESCRIPTION
@@ -30,10 +30,8 @@ sub new {
 		
 	$self->{_dsn}		=	"DBI:mysql:database=$target;host=localhost;port=3306;mysql_socket=/var/lib/mysql/mysql.sock";
 		
-	$self->{_db} 		=	DBI->connect($self->{_dsn}, "checking_dweb", "P4kWbX0sE0QnOQwW66pnE8NTX8NWuL", { mysql_enable_utf8 => 1, }) or die "Cannot connect to Mysql";
-	
-	$self->{_db}->do('SET NAMES \'utf8\';') || die;
-		
+	$self->{_db} 		=	DBI->connect($self->{_dsn}, "checking_dweb", "P4kWbX0sE0QnOQwW66pnE8NTX8NWuL", {}) or die "Cannot connect to Mysql";
+			
 	return $self
 }
 #Load Email that have to be test,based on frequency
@@ -125,21 +123,20 @@ sub loadLastOperationIdFromSiteid {
 sub insert_operation {
 	my $self = shift;
 	my ($args) = shift;
-	
+
 	my $insert_operation = "INSERT INTO $TABLE_OPERATION 
 			   (id   , date  ,  content, unMatchKeywords, matchKeywords, googleAna ,cms , site_id, genTime, pageRank, status, ip, ping )
 		VALUES (NULL , NOW() ,  ?      ,  ?             , ?            , ?         , ?  , ?      , ?      , ?		, ?		, ?	, ?);";
 	my $db_keywords = $self->{_db}->prepare( $insert_operation );
-
+		
 	if( $args->{gzip} ){
 		use IO::Compress::Gzip qw(gzip $GzipError) ;
 		my $content_compress;
 		
-		gzip \$args->{content} => \$content_compress;
-		
 		use bytes;
-		my $gain = (length($args->{content}) - length($content_compress)) / 1000;
-		$LOGGER->debug("gZip saved ".$gain." kBytes !");
+		gzip \$args->{content} => \$content_compress;
+		no bytes;
+
 		$args->{content} = $content_compress;	
 		undef $content_compress;
 	} 
@@ -156,9 +153,9 @@ sub loadContentOperationId {
 	
 	use IO::Uncompress::Gunzip qw(gunzip $GunzipError) ;
 	my $uncompressedScreenshot;
-
+	use bytes;
 	gunzip \$content => \$uncompressedScreenshot;
-
+	no bytes;
 	return $uncompressedScreenshot;
 }
 1;

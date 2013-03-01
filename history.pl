@@ -10,6 +10,11 @@ BEGIN{
 
 use Db;
 use utf8;
+
+my $conf_path = "conf/";
+my $log = $conf_path."log4p-prod.conf";
+Log::Log4perl->init($log);
+
 my $idoperation = $ARGV[0];
 
 die("No operation id provided !") if ! defined $idoperation;
