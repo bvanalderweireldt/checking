@@ -165,14 +165,13 @@ sub scanUnMatchKeywords{
 
 	$self->{keywords} = Encode::encode("utf8", $self->{keywords});
 	
-	my $keywords = $self->{keywords};
-	$keywords =~ s/([^\S\n]|[ ]|\n|\t)/\\s/g;
-	
-	if( defined $keywords && defined $self->{content}  && $self->{content} ne '' ){
-		my @keywords_specific = split ( ";", $keywords );
+	if( defined $self->{keywords} && defined $self->{content}  && $self->{content} ne '' ){
+		my @keywords_specific = split ( ";", $self->{keywords} );
 		foreach my $keyword ( @keywords_specific ){
+			my $keyword_regex = $keyword;
+			$keyword_regex =~ s/([^\S\n]|[ ]|\n|\t)/\\s/g;
 			#if it doesn't contain the given keyword
-			if ( $self->{content} !~ /$keyword/i ){
+			if ( $self->{content} !~ /$keyword_regex/i ){
 				$self->{unMatchKey} = comaConcat( $self->{unMatchKey}, $keyword );
 				$self->{status} = 3;
 			}
