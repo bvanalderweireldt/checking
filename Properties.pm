@@ -6,7 +6,7 @@ package Properties;
 
 use strict;
 use warnings;
-
+use utf8;
 use Log::Log4perl;
 my $LOGGER = Log::Log4perl->get_logger("Props");
 

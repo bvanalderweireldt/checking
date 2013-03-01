@@ -8,6 +8,7 @@ use strict;
 package Email;
 use Site;
 use Log::Log4perl;
+use utf8;
 my $LOGGER = Log::Log4perl->get_logger("Email");
 
 #DEFAULT LANGAGE

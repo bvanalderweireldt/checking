@@ -5,6 +5,7 @@
 
 package Utils;
 use Time::HiRes qw(tv_interval gettimeofday);
+use utf8;
 #
 #
 # Initiate Logger

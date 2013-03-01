@@ -5,7 +5,7 @@
 
 use DBI;
 use strict;
-
+use utf8;
 my $db_s_dsn = "DBI:mysql:database=checkingweb;host=localhost;port=3306;mysql_socket=/var/lib/mysql/mysql.sock";
 my $db_s = DBI->connect($db_s_dsn, "root", $ARGV[0] ) or die "Cannot connect to Mysql";
 

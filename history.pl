@@ -9,7 +9,7 @@ BEGIN{
 }
 
 use Db;
-
+use utf8;
 my $idoperation = $ARGV[0];
 
 die("No operation id provided !") if ! defined $idoperation;

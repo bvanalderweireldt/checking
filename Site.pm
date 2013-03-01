@@ -164,9 +164,12 @@ sub scanUnMatchKeywords{
 	my ($self) = shift;
 
 	$self->{keywords} = Encode::encode("utf8", $self->{keywords});
-
-	if( defined $self->{keywords} && defined $self->{content}  && $self->{content} ne '' ){
-		my @keywords_specific = split ( ";", $self->{keywords} );
+	
+	my $keywords = $self->{keywords};
+	$keywords =~ s/([^\S\n]|[ ]|\n|\t)/\\s/g;
+	
+	if( defined $keywords && defined $self->{content}  && $self->{content} ne '' ){
+		my @keywords_specific = split ( ";", $keywords );
 		foreach my $keyword ( @keywords_specific ){
 			#if it doesn't contain the given keyword
 			if ( $self->{content} !~ /$keyword/i ){
