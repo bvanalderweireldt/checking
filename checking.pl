@@ -173,7 +173,7 @@ while( my @email = $emails_db->fetchrow_array) {
 # Multi Thread part, we will launch one thread for every site, with a maximum of $nb_process threads	
 #
 #	
-	my $nb_process = 15; #Number of simultaneous process that can run
+	my $nb_process = 5; #Number of simultaneous process that can run
 	my $nb_compute = $websites_db->rows; # Number of sites(process) we will need to run
 	my @sites;
 	my @running = ();
@@ -204,7 +204,7 @@ while( my @email = $emails_db->fetchrow_array) {
 			# We try to close thread that can be close, to avoid high memory peak
 			#
 			#
-			@joinable = threads->list(threads::joinable);
+			@joinable = threads->list();
 			foreach my $thread ( @joinable ){
 				if( $thread->is_joinable() ){
 					my $site_to_save = $thread->join();
@@ -244,7 +244,7 @@ while( my @email = $emails_db->fetchrow_array) {
 			try{
 				my $site_to_save = $thread->join();
 				try{
-					${$site_to_save}->save_operation( { db => \$db, gzip => \$gzip } );
+					${$site_to_save}->Site::save_operation( { db => \$db, gzip => \$gzip } );
 					$db->updateSiteSatus( { status =>  ${$site_to_save}->getStatus(), id => ${$site_to_save}->getId() } );
 					$emailToNotify->addSiteRef( $site_to_save );
 					try{
@@ -255,7 +255,7 @@ while( my @email = $emails_db->fetchrow_array) {
 					}
 				}
 				catch{
-					$LOGGER->error("Cannot save a site operation !!!");
+					$LOGGER->error("Cannot save a site operation !!!".$_);
 				}
 			}
 			catch{

@@ -123,7 +123,7 @@ sub download{
 	my($timeStart) = [gettimeofday()];
 	$LOGGER->debug($protocol.$self->{address});
 	my $response = $ua->get( $protocol.$self->{address} );
-	$self->{content} = $response->content ;
+	$self->{content} = $response->content;
 	my($timeElapsed) = tv_interval($timeStart, [gettimeofday()]);
 	$self->{genTime} = ( $timeElapsed * 1000 );
 
@@ -153,7 +153,7 @@ sub scanGLobalKeywords{
 
 	foreach my $global_keyword ( @{$args->{keywords}} ){
 	$global_keyword = Encode::encode("utf8", $global_keyword);
-		if ( $self->{content} =~ /.*$global_keyword.*/i ){
+		if ( $self->{content} =~ /$global_keyword/i ){
 			$self->{matchKey} = comaConcat( $self->{matchKey}, $global_keyword );
 			$self->{status} = 2;
 		}
@@ -163,15 +163,13 @@ sub scanGLobalKeywords{
 sub scanUnMatchKeywords{
 	my ($self) = shift;
 
-	use Data::Dumper;
-
 	$self->{keywords} = Encode::encode("utf8", $self->{keywords});
 
-	if( defined $self->{keywords} ){
+	if( defined $self->{keywords} && defined $self->{content}  && $self->{content} ne '' ){
 		my @keywords_specific = split ( ";", $self->{keywords} );
 		foreach my $keyword ( @keywords_specific ){
 			#if it doesn't contain the given keyword
-			if ( $self->{content} !~ /.*$keyword.*/ ){
+			if ( $self->{content} !~ /$keyword/i ){
 				$self->{unMatchKey} = comaConcat( $self->{unMatchKey}, $keyword );
 				$self->{status} = 3;
 			}
