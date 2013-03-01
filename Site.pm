@@ -18,6 +18,8 @@ use Properties;
 use  Log::Log4perl;
 my $LOGGER = Log::Log4perl->get_logger("Site");
 use threads;
+use utf8;
+use Encode;
 
 my $protocol = "http://";
 
@@ -150,6 +152,7 @@ sub scanGLobalKeywords{
 	my ($args) = shift;
 
 	foreach my $global_keyword ( @{$args->{keywords}} ){
+	$global_keyword = Encode::encode("utf8", $global_keyword);
 		if ( $self->{content} =~ /.*$global_keyword.*/i ){
 			$self->{matchKey} = comaConcat( $self->{matchKey}, $global_keyword );
 			$self->{status} = 2;
@@ -159,6 +162,10 @@ sub scanGLobalKeywords{
 #scan for expected keywords that doesn't match
 sub scanUnMatchKeywords{
 	my ($self) = shift;
+
+	use Data::Dumper;
+
+	$self->{keywords} = Encode::encode("utf8", $self->{keywords});
 
 	if( defined $self->{keywords} ){
 		my @keywords_specific = split ( ";", $self->{keywords} );
@@ -170,7 +177,6 @@ sub scanUnMatchKeywords{
 			}
 		}
 	}
-	undef @keywords_specific;
 }
 #Scan for Google Analytic Presence
 sub scanForGoogleAnalytic{

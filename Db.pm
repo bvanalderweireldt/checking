@@ -30,8 +30,10 @@ sub new {
 		
 	$self->{_dsn}		=	"DBI:mysql:database=$target;host=localhost;port=3306;mysql_socket=/var/lib/mysql/mysql.sock";
 		
-	$self->{_db} 		=	DBI->connect($self->{_dsn}, "checking_dweb", "P4kWbX0sE0QnOQwW66pnE8NTX8NWuL") or die "Cannot connect to Mysql";
+	$self->{_db} 		=	DBI->connect($self->{_dsn}, "checking_dweb", "P4kWbX0sE0QnOQwW66pnE8NTX8NWuL", { mysql_enable_utf8 => 1, }) or die "Cannot connect to Mysql";
 	
+	$self->{_db}->do('SET NAMES \'utf8\';') || die;
+		
 	return $self
 }
 #Load Email that have to be test,based on frequency

@@ -20,6 +20,7 @@ use File::Slurp;
 use Log::Log4perl;
 use threads;
 use Try::Tiny;
+use utf8;
 #
 #
 # Global Configuration
