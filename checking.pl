@@ -30,7 +30,7 @@ my $conf_path = "conf/";
 my $db_target = "checking_dweb";
 my $gzip = 1;
 my $siteid = 0;
-my $userid = 0;
+my $userid = undef;
 my $log = $conf_path."log4p-prod.conf";
 
 
@@ -109,7 +109,7 @@ if( $siteid != 0 ){
 #
 #
 my $emails_db;
-if( $userid != 0){
+if( defined $userid ){
 	$LOGGER->info("Loading one Email id : $userid");
 	$emails_db = $db->loadEmailByUserId({ userid => $userid });
 }
@@ -138,6 +138,8 @@ my @emails;
 #
 #
 $LOGGER->debug("Scanning to find what emails account have to be check !");
+my $frequency = Utils::getFrequency();
+my $timeSlot = Utils::getTimeSlot();
 while( my @email = $emails_db->fetchrow_array) {
 		
 	if (! defined $email[0] or $email[0] eq ""){
@@ -147,11 +149,13 @@ while( my @email = $emails_db->fetchrow_array) {
 	$LOGGER->debug("Analizing : ".$email[0]);
 	
 	#if the site is activate but have no frequency we set it to 4 hours
-	$email[4] = ( ( 60 / Utils::getFrequency() ) * 4 ) unless ( defined $email[4] && $email[4] ne 0 );
+	$email[4] = ( ( 60 / $frequency ) * 4 ) unless ( defined $email[4] && $email[4] ne 0 );
 	#if the website don't have to be check now we go to the next one
-	$LOGGER->debug("Ignore : ".$email[0]) and next unless ( Utils::getTimeSlot() % $email[4] == 0  || $userid != 0);
+	my $r = $timeSlot % $email[4];
 
-	$LOGGER->debug("#### Find one email account to check ".$email[0].", now will load websites associates.");
+	$LOGGER->info("Ignore : ".$email[0]) and next unless ( $r == 0 || defined $userid );
+	
+	$LOGGER->info("#### Find one email account to check ".$email[0].", now will load websites associates.");
 	#we a new email and save it into the global array of email
 	my $emailToNotify = Email->new( { 
 		id => $email[5],
@@ -164,7 +168,7 @@ while( my @email = $emails_db->fetchrow_array) {
 		lang => $email[7] });
 	push( @emails, $emailToNotify );
 	undef @email;
-	my $monitor = ( $userid == 0 )?"1":"0,1";
+	my $monitor = ( ! defined $userid )?"1":"0,1";
 		
 	my $websites_db = $db->loadWebsitesEmailAccount( { monitor => $monitor, user_id => $emailToNotify->getId() } );
 	
