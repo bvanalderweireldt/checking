@@ -16,7 +16,7 @@ use Site;
 use Email;
 use Utils;
 use MIME::Lite;
-use File::Slurp;
+use File::Slurp::Unicode;
 use Log::Log4perl;
 use threads;
 use Try::Tiny;
@@ -275,7 +275,7 @@ while( my @email = $emails_db->fetchrow_array) {
 #
 $LOGGER->debug("Starting the email loop, must send : ".scalar(@emails)." email(s)");
 foreach my $email_account ( @emails ){
-	my $mail_template = read_file( "mail_template/basic-".$email_account->getLang().".html" );
+	my $mail_template = read_file( "mail_template/basic-".$email_account->getLang().".html", encoding => "utf8" );
 	$LOGGER->debug("Preparing mail content for : ".$email_account->getEmail());
 
 	if( $email_account->getCountSites() == 0 ){
