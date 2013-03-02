@@ -21,6 +21,7 @@ use Log::Log4perl;
 use threads;
 use Try::Tiny;
 use utf8;
+use Encode;
 #
 #
 # Global Configuration
