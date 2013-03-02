@@ -311,8 +311,8 @@ foreach my $email_account ( @emails ){
 	             To       => $email_account->getEmail(),
 	             Cc       => $cc,
 	             Subject  => "WebSite Checking",
-	             Data     => encode("utf8", $mail_template),
-	             Type	  => "text/html; charset=iso-8859-1"
+	             Data     => $mail_template,
+	             Type	  => "text/html; charset=UTF-8"
 	             );
 	
 	$LOGGER->debug("Message send : ".$msg->send);
