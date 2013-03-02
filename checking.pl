@@ -310,7 +310,7 @@ foreach my $email_account ( @emails ){
 	             To       => $email_account->getEmail(),
 	             Cc       => $cc,
 	             Subject  => "WebSite Checking",
-	             Data     => $mail_template,
+	             Data     => encode("utf8", $mail_template),
 	             Type	  => "text/html; charset=iso-8859-1"
 	             );
 	
